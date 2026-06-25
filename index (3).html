@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Quyosh Tizimi — Kosmik Sayohat</title>
+  <style>
+/* ============================================================
+   QUYOSH TIZIMI — Stillar
+   Glassmorphism + ko‘k/binafsha neon + mobil moslashuv
+   ============================================================ */
+
+:root{
+  --bg:        #05060f;
+  --neon:      #4ea8ff;        /* ko‘k neon */
+  --neon-2:    #a06bff;        /* binafsha neon */
+  --glass:     rgba(16, 20, 40, 0.55);
+  --glass-brd: rgba(140, 170, 255, 0.18);
+  --text:      #e8edff;
+  --text-dim:  #9aa6cc;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{
+  height:100%;
+  background:#05060f;
+  color:var(--text);
+  font-family:"Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+
+#scene{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.hidden{ display:none !important; }
+
+/* ---------- Yuklanish ekrani ---------- */
+#loader{
+  position:fixed; inset:0; z-index:50;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:22px;
+  background:radial-gradient(circle at 50% 50%, #0a1030 0%, #05060f 70%);
+  color:var(--text-dim); letter-spacing:.15em; font-size:13px;
+}
+.loader-core{
+  width:54px; height:54px; border-radius:50%;
+  border:2px solid rgba(120,150,255,.15);
+  border-top-color:var(--neon);
+  border-right-color:var(--neon-2);
+  animation:spin 1s linear infinite;
+  box-shadow:0 0 30px rgba(78,168,255,.5);
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ---------- Intro ekrani ---------- */
+#intro{
+  position:fixed; inset:0; z-index:40;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 50% 40%, rgba(20,28,70,.45), rgba(5,6,15,.85) 70%);
+  backdrop-filter:blur(2px);
+  opacity:1;
+  padding:24px;
+  text-align:center;
+}
+.intro-inner{ max-width:640px; }
+.eyebrow{
+  color:var(--neon); letter-spacing:.5em; font-size:12px; margin-bottom:18px;
+  text-shadow:0 0 16px rgba(78,168,255,.7);
+}
+#intro h1{
+  font-size:clamp(48px, 11vw, 120px);
+  font-weight:800; line-height:.92; letter-spacing:.02em;
+  filter:drop-shadow(0 0 30px rgba(120,120,255,.35));
+}
+#intro h1 span{
+  display:block;
+  background:linear-gradient(120deg,#ffffff 0%, var(--neon) 45%, var(--neon-2) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+#intro h1 span:last-child{ font-weight:300; opacity:.9; }
+.lead{
+  margin:26px auto 34px; max-width:520px;
+  color:var(--text-dim); font-size:clamp(14px,2.4vw,17px); line-height:1.7;
+}
+#startBtn{
+  cursor:pointer; border:none; border-radius:100px;
+  padding:16px 38px; font-size:16px; font-weight:600; color:#fff;
+  background:linear-gradient(120deg, var(--neon), var(--neon-2));
+  box-shadow:0 0 40px rgba(100,120,255,.55), inset 0 0 0 1px rgba(255,255,255,.25);
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+#startBtn:hover{ transform:translateY(-3px) scale(1.03);
+  box-shadow:0 0 60px rgba(120,140,255,.8), inset 0 0 0 1px rgba(255,255,255,.4); }
+.hint-row{
+  display:flex; gap:22px; justify-content:center; flex-wrap:wrap;
+  margin-top:38px; color:var(--text-dim); font-size:12.5px; letter-spacing:.04em;
+}
+
+/* ---------- Glass umumiy ---------- */
+.glass{
+  background:var(--glass);
+  border:1px solid var(--glass-brd);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 8px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+/* ---------- Yuqori panel ---------- */
+#topbar{
+  position:fixed; top:18px; left:18px; right:18px; z-index:20;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px; border-radius:16px;
+  opacity:1; transition:opacity .4s ease;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.22em; font-size:13px; }
+.brand .dot{ width:9px; height:9px; border-radius:50%;
+  background:var(--neon); box-shadow:0 0 14px var(--neon); }
+.controls{ display:flex; gap:10px; }
+.icon-btn{
+  width:40px; height:40px; border-radius:12px; cursor:pointer;
+  background:rgba(255,255,255,.05); color:var(--text);
+  border:1px solid var(--glass-brd); font-size:17px;
+  transition:.2s; display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover{ background:rgba(78,168,255,.18); box-shadow:0 0 18px rgba(78,168,255,.4); }
+.icon-btn.active{ background:rgba(160,107,255,.25); box-shadow:0 0 18px rgba(160,107,255,.5); }
+
+/* Til almashtirgich */
+.lang-switch{ display:flex; gap:4px; padding:3px; border-radius:11px;
+  background:rgba(255,255,255,.05); border:1px solid var(--glass-brd); }
+.lang-btn{
+  cursor:pointer; border:none; background:transparent; color:var(--text-dim);
+  font-size:11.5px; font-weight:700; letter-spacing:.06em; padding:6px 10px; border-radius:8px;
+  transition:.2s;
+}
+.lang-btn:hover{ color:#fff; }
+.lang-btn.active{ color:#fff; background:linear-gradient(120deg, var(--neon), var(--neon-2));
+  box-shadow:0 0 14px rgba(100,120,255,.45); }
+#introLang{ position:absolute; top:22px; right:22px; }
+
+/* Muallif yozuvi (bosiladigan havola) */
+#credit{
+  position:fixed; bottom:16px; right:18px; z-index:18;
+  font-size:11.5px; letter-spacing:.04em; color:var(--text-dim);
+  background:rgba(10,14,30,.5); border:1px solid var(--glass-brd);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  padding:7px 13px; border-radius:100px; text-decoration:none; cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.35); transition:.2s;
+}
+#credit:hover{ color:#fff; border-color:var(--neon); box-shadow:0 0 18px rgba(78,168,255,.4); }
+#credit .credit-star{ color:var(--neon); }
+body.clean #credit{ display:none; }
+
+/* Intro — sarlavha tagidagi muallif havolasi */
+.author-link{
+  display:inline-block; margin-top:14px; text-decoration:none;
+  color:var(--text); font-size:clamp(15px,2.6vw,19px); font-weight:600; letter-spacing:.04em;
+  padding-bottom:3px; position:relative; transition:.25s;
+}
+.author-link::after{
+  content:""; position:absolute; left:50%; right:50%; bottom:0; height:2px;
+  background:linear-gradient(90deg,var(--neon),var(--neon-2)); transition:.3s; border-radius:2px;
+}
+.author-link:hover{ color:#fff; text-shadow:0 0 18px rgba(120,140,255,.6); }
+.author-link:hover::after{ left:0; right:0; }
+
+/* Sayohat hikoya matni (subtitr) */
+#tourCaption{
+  position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(16px);
+  z-index:22; width:min(640px, calc(100% - 36px));
+  opacity:0; pointer-events:none; transition:transform .5s cubic-bezier(.16,1,.3,1);
+}
+#tourCaption.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.tc-card{ padding:18px 22px; border-radius:18px; text-align:center; }
+.tc-name{
+  color:var(--neon); font-size:12px; font-weight:700; letter-spacing:.28em; text-transform:uppercase;
+  text-shadow:0 0 14px rgba(78,168,255,.6);
+}
+.tc-text{ margin-top:8px; font-size:15px; line-height:1.6; color:var(--text); text-wrap:pretty; }
+body.clean #tourCaption{ display:none; }
+
+/* Koinot faktlari modali */
+.cosmos-overlay{
+  position:fixed; inset:0; z-index:45; display:none;
+  align-items:center; justify-content:center; padding:24px;
+  background:radial-gradient(circle at 50% 45%, rgba(20,28,70,.5), rgba(5,6,15,.86) 70%);
+  backdrop-filter:blur(4px);
+}
+.cosmos-overlay.open{ display:flex; }
+.cosmos-card{
+  position:relative; max-width:560px; width:100%;
+  padding:34px 32px; border-radius:24px; text-align:center;
+}
+.cosmos-eyebrow{ color:var(--neon); letter-spacing:.6em; font-size:13px; margin-bottom:12px;
+  text-shadow:0 0 16px rgba(78,168,255,.7); }
+.cosmos-card h2{
+  font-size:clamp(24px,5vw,34px); font-weight:800; margin-bottom:22px; line-height:1.15;
+  background:linear-gradient(120deg,#fff, var(--neon) 60%, var(--neon-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.cosmos-card ul{ list-style:none; display:flex; flex-direction:column; gap:12px; text-align:left; }
+.cosmos-card li{
+  position:relative; padding:13px 15px 13px 42px; border-radius:14px; font-size:14px; line-height:1.55;
+  color:var(--text); background:rgba(255,255,255,.04); border:1px solid rgba(140,170,255,.12);
+}
+.cosmos-card li::before{
+  content:"✦"; position:absolute; left:15px; top:13px; color:var(--neon);
+  text-shadow:0 0 10px rgba(78,168,255,.8);
+}
+@keyframes popIn{ from{ opacity:0; transform:scale(.92) translateY(14px); } to{ opacity:1; transform:none; } }
+
+/* Interfeysni yashirish tugmasi (har doim ko‘rinib turadi) */
+.ui-toggle{
+  position:fixed; bottom:18px; left:18px; z-index:60;
+  width:44px; height:44px; border-radius:13px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:19px;
+  color:var(--text); background:var(--glass); border:1px solid var(--glass-brd);
+  backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 8px 30px rgba(0,0,0,.45); transition:.2s;
+}
+.ui-toggle:hover{ background:rgba(78,168,255,.18); box-shadow:0 0 20px rgba(78,168,255,.45); transform:translateY(-2px); }
+
+/* «Toza» (kinematik) rejim — barcha interfeys yashiriladi, faqat tugma qoladi */
+body.clean #topbar, body.clean #dock, body.clean #panel{ display:none !important; }
+
+/* ---------- Pastki dock (sayyoralar) ---------- */
+#dock{
+  position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:20;
+  display:flex; gap:6px; padding:8px; border-radius:18px;
+  max-width:calc(100% - 36px); overflow-x:auto;
+  opacity:1; scrollbar-width:none;
+}
+#dock::-webkit-scrollbar{ display:none; }
+.dock-item{
+  flex:0 0 auto; cursor:pointer; border:none; background:transparent;
+  color:var(--text-dim); font-size:12px; font-weight:600; letter-spacing:.04em;
+  padding:9px 14px; border-radius:12px; transition:.2s; white-space:nowrap;
+  display:flex; align-items:center; gap:8px;
+}
+.dock-item:hover{ color:#fff; background:rgba(255,255,255,.06); }
+.dock-item.active{ color:#fff; background:rgba(78,168,255,.2); box-shadow:0 0 16px rgba(78,168,255,.35); }
+.dock-swatch{ width:11px; height:11px; border-radius:50%; box-shadow:0 0 8px currentColor; }
+
+/* ---------- O‘ng ma'lumot paneli ---------- */
+#panel{
+  position:fixed; top:78px; right:18px; z-index:25;
+  width:340px; max-width:calc(100% - 36px);
+  padding:22px; border-radius:20px;
+  transform:translateX(120%); opacity:0; pointer-events:none;
+  transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .4s ease;
+  max-height:calc(100vh - 100px); overflow-y:auto;
+}
+#panel.open{ transform:translateX(0); opacity:1; pointer-events:auto; }
+#panel::-webkit-scrollbar{ width:6px; }
+#panel::-webkit-scrollbar-thumb{ background:rgba(140,170,255,.3); border-radius:6px; }
+
+.panel-close{
+  position:absolute; top:16px; right:16px; cursor:pointer;
+  width:30px; height:30px; border-radius:9px; border:1px solid var(--glass-brd);
+  background:rgba(255,255,255,.05); color:var(--text-dim); font-size:13px; transition:.2s;
+}
+.panel-close:hover{ color:#fff; background:rgba(255,90,120,.25); }
+.panel-head #panelType{
+  color:var(--neon); font-size:11px; letter-spacing:.35em; font-weight:600;
+  text-shadow:0 0 12px rgba(78,168,255,.6);
+}
+.panel-head h2{
+  font-size:32px; font-weight:800; margin-top:6px; letter-spacing:.01em;
+  background:linear-gradient(120deg,#fff, var(--neon-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.panel-desc{ color:var(--text-dim); font-size:13.5px; line-height:1.65; margin:14px 0 18px; }
+
+.stats{ display:flex; flex-direction:column; gap:14px; }
+.sec-title{
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700;
+  color:var(--neon); margin:4px 0 -2px; display:flex; align-items:center; gap:8px;
+}
+.sec-title::after{ content:""; flex:1; height:1px;
+  background:linear-gradient(90deg, rgba(140,170,255,.35), transparent); }
+.stats-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.stat{
+  background:rgba(255,255,255,.04); border:1px solid rgba(140,170,255,.1);
+  border-radius:13px; padding:11px 12px;
+}
+.stat .k{ font-size:10.5px; color:var(--text-dim); letter-spacing:.04em; text-transform:uppercase; }
+.stat .v{ font-size:14.5px; font-weight:700; margin-top:3px; }
+.stat.wide{ grid-column:1 / -1; }
+
+/* Tarkib / atmosfera diagrammasi */
+.comp{ display:flex; flex-direction:column; gap:9px; }
+.comp-top{ display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); margin-bottom:4px; }
+.comp-top span:last-child{ color:#fff; font-weight:600; }
+.comp-bar{ height:7px; border-radius:6px; background:rgba(255,255,255,.07); overflow:hidden; }
+.comp-bar i{ display:block; height:100%; border-radius:6px;
+  box-shadow:0 0 12px currentColor; transition:width .8s cubic-bezier(.16,1,.3,1); }
+
+/* Panel harakat tugmalari */
+.panel-actions{ display:flex; gap:9px; margin:16px 0 4px; }
+.pbtn{
+  flex:1; cursor:pointer; border-radius:12px; padding:11px 10px;
+  font-size:12.5px; font-weight:600; color:var(--text);
+  background:rgba(255,255,255,.05); border:1px solid var(--glass-brd);
+  transition:.2s; white-space:nowrap;
+}
+.pbtn:hover{ background:rgba(255,255,255,.1); transform:translateY(-1px); }
+.pbtn.primary{
+  color:#fff; border:none;
+  background:linear-gradient(120deg, var(--neon), var(--neon-2));
+  box-shadow:0 0 22px rgba(100,120,255,.45);
+}
+.pbtn.primary:hover{ box-shadow:0 0 30px rgba(120,140,255,.7); }
+
+/* Tezlik boshqaruvi */
+.speed-ctl{ display:flex; align-items:center; gap:9px; padding-right:6px;
+  border-right:1px solid var(--glass-brd); margin-right:4px; }
+#speedVal{ font-size:12px; font-weight:600; color:var(--text-dim); min-width:34px; text-align:center; }
+#speed{
+  -webkit-appearance:none; appearance:none; width:96px; height:4px; border-radius:4px;
+  background:linear-gradient(90deg, var(--neon), var(--neon-2)); outline:none; cursor:pointer;
+}
+#speed::-webkit-slider-thumb{
+  -webkit-appearance:none; width:15px; height:15px; border-radius:50%;
+  background:#fff; box-shadow:0 0 10px var(--neon); cursor:pointer;
+}
+#speed::-moz-range-thumb{
+  width:15px; height:15px; border:none; border-radius:50%;
+  background:#fff; box-shadow:0 0 10px var(--neon); cursor:pointer;
+}
+
+.fact{
+  margin-top:16px; padding:14px 15px; border-radius:14px;
+  background:linear-gradient(120deg, rgba(78,168,255,.12), rgba(160,107,255,.12));
+  border:1px solid rgba(140,170,255,.18);
+}
+.fact-label{ color:var(--neon); font-size:11px; font-weight:700; letter-spacing:.08em; }
+.fact p{ margin-top:7px; font-size:13px; line-height:1.6; color:var(--text); }
+
+/* Sayyora ustidagi 2D yorliq */
+.hover-label{
+  position:fixed; z-index:15; pointer-events:none;
+  transform:translate(-50%,-140%);
+  padding:5px 11px; border-radius:9px; font-size:12px; font-weight:600; letter-spacing:.04em;
+  background:rgba(10,14,30,.7); border:1px solid var(--glass-brd);
+  backdrop-filter:blur(8px); color:#fff; white-space:nowrap;
+  box-shadow:0 0 18px rgba(78,168,255,.25); opacity:0; transition:opacity .15s;
+}
+
+@keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+
+/* ---------- Mobil ---------- */
+@media (max-width:680px){
+  #panel{
+    top:auto; bottom:0; right:0; left:0; width:100%; max-width:100%;
+    border-radius:22px 22px 0 0; max-height:64vh;
+    transform:translateY(110%); padding:18px 18px 26px;
+  }
+  #panel.open{ transform:translateY(0); }
+  #dock{ bottom:auto; top:70px; }
+  #topbar{ top:10px; left:10px; right:10px; padding:8px 12px; }
+  .brand{ display:none; }                       /* joy tejash uchun mobilda yashiriladi */
+  .controls{ gap:8px; width:100%; justify-content:space-between; }
+  .icon-btn{ width:38px; height:38px; font-size:16px; }
+  #speed{ width:64px; }
+  #speedVal{ display:none; }
+  .speed-ctl{ gap:6px; padding-right:6px; margin-right:0; border-right:none; }
+  .lang-btn{ padding:6px 8px; font-size:11px; }
+  .hint-row{ gap:12px; font-size:11.5px; }
+  .panel-head h2{ font-size:26px; }
+  .panel-actions{ flex-wrap:wrap; }
+  .pbtn.primary{ flex:1 1 100%; }
+  .pbtn:not(.primary){ flex:1 1 0; }
+  .ui-toggle{ bottom:auto; top:50%; left:10px; transform:translateY(-50%); }
+  .ui-toggle:hover{ transform:translateY(-50%); }
+  #introLang{ top:14px; right:14px; }
+}
+@media (max-width:380px){
+  #intro h1{ font-size:44px; }
+  .eyebrow{ letter-spacing:.32em; }
+  .hint-row span:nth-child(2){ display:none; }   /* eng tor ekranda bitta maslahatni yashirish */
+}
+
+</style>
+  <!-- Three.js (r128) va OrbitControls CDN orqali yuklanadi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Ko‘p tilli ma'lumotlar -->
+  <script>
+/* ==========================================================================
+   QUYOSH TIZIMI — Ko‘p tilli ma'lumotlar (O‘zbek / Русский / English)
+   window.LOC orqali script.js dan o‘qiladi.
+   ========================================================================== */
+window.LOC = {
+
+/* ----------------------------- O‘ZBEK ----------------------------- */
+uz: {
+  langName:'UZ',
+  tour:{
+    sun:'Sayohatimiz markazdan — Quyoshdan boshlanadi. Uning ichiga bir million Yer sig‘adi va u butun tizimni o‘z tortishishi bilan boshqaradi.',
+    mercury:'Mana Merkuriy — kichkina va tez. U Quyosh atrofini atigi 88 kunda aylanadi, biroq kunduzi qizib, kechasi muzlab qoladi.',
+    venus:'Venera — chiroyli, ammo shafqatsiz dunyo. Qalin bulutlari ostida harorat qo‘rg‘oshinni eritadigan darajada yuqori.',
+    earth:'Va mana — uyimiz, Yer. Ko‘k okeanlar, oq bulutlar va yashil qit’alar. Hozircha hayot topilgan yagona sayyora.',
+    mars:'Qizil Mars — kelajak orzusi. Olimlar bir kun bu yerda inson izini ko‘rishni umid qilmoqda.',
+    jupiter:'Ulkan Yupiter yonidamiz. Uning Katta Qizil Dog‘i — asrlar davomida to‘xtamayotgan ulkan bo‘ron.',
+    saturn:'Saturnning halqalari — koinotning eng go‘zal manzarasi. Ular muz va tosh bo‘laklaridan iborat.',
+    uranus:'Uran — yonboshi bilan dumalab yuruvchi muz giganti. U boshqa hech bir sayyoraga o‘xshamaydi.',
+    neptune:'Eng chekkadagi Neptun — shamollar shohligi. Shu yerda sayohatimizning sayyoralar qismi yakunlanadi…'
+  },
+  ui:{
+    eyebrow:'INTERAKTIV 3D TAJRIBA', title1:'QUYOSH', title2:'TIZIMI',
+    lead:'Kosmik kema kabinasiga xush kelibsiz. Sayyoralar orasida sayr qiling, ularni bosib batafsil ma’lumot oling va koinot kengligini his eting.',
+    startBtn:'🚀 Kosmik sayohatni boshlash',
+    hintRotate:'🖱️ Aylantirish', hintZoom:'🔍 G‘ildirakcha — masshtab', hintClick:'👆 Sayyorani bosing',
+    brand:'QUYOSH TIZIMI',
+    secMain:'Asosiy ko‘rsatkichlar', secPhys:'Orbital va fizik xususiyatlar',
+    secComp:'Tarkibi / Atmosfera', factLabel:'★ Qiziqarli fakt',
+    focusBtn:'🔭 Yaqindan ko‘rish', backBtn:'↺ Umumiy ko‘rinish',
+    ringsOn:'💍 Halqalar bilan', ringsOff:'⊘ Halqalarsiz',
+    satsOn:'🛰️ Yo‘ldoshlari bilan', satsOff:'⊘ Yo‘ldoshsiz',
+    speedTitle:'Aylanish tezligi',
+    hideUI:'Interfeysni yashirish', showUI:'Interfeysni ko‘rsatish',
+    tourBtn:'Sayohat', tourStop:'Sayohatni to‘xtatish', authorLabel:'Muallif',
+    cosmosTitle:'Koinot haqida qiziqarli faktlar',
+    cosmosFacts:[
+      'Kuzatiladigan koinotda 100 milliarddan ortiq galaktika mavjud.',
+      'Bizga eng yaqin yulduz — Proksima Kentavr 4.24 yorug‘lik yili uzoqlikda.',
+      'Koinot taxminan 13.8 milliard yil avval Katta portlash bilan boshlangan.',
+      'Qora tuynukning tortishish kuchi shunchalik kuchliki, hatto yorug‘lik ham qocha olmaydi.',
+      'Koinotning 95% i ko‘zga ko‘rinmas qorong‘u modda va qorong‘u energiyadan iborat.'
+    ],
+    lDist:'Quyoshdan masofa', lDia:'Diametri', lMass:'Massasi', lMoons:'Yo‘ldoshlari',
+    lPeriod:'Aylanish davri', lDay:'Bir kun (o‘q)', lGravity:'Tortishish', lEscape:'Qochish tezligi',
+    lVelocity:'Orbital tezlik', lTemp:'Harorati', lTilt:'O‘q qiyaligi',
+    lDiscovered:'Kashf etilgan', lDensity:'Zichligi'
+  },
+  bodies:{
+    sun:{ name:'Quyosh', type:'YULDUZ',
+      desc:'Quyosh tizimining markazidagi yulduz. Uning tortishish kuchi barcha sayyoralarni ushlab turadi.',
+      dist:'0 km (markaz)', dia:'1 392 700 km', mass:'1.99×10³⁰ kg', atmo:'Plazma (H + He)', moons:'8 sayyora',
+      temp:'Yuzasi ≈ 5 500°C', period:'—', day:'≈ 27 kun', gravity:'274 m/s² (28×)', escape:'617.5 km/s',
+      velocity:'≈ 220 km/s', discovered:'—', tilt:'7.25°', density:'1.41 g/sm³',
+      fact:'Massasi butun tizimning 99.8% ini tashkil etadi. Yorug‘lik undan Yergacha 8 daqiqada yetadi.',
+      comp:[['Vodorod',73],['Geliy',25],['Kislorod',1],['Boshqa',1]] },
+    mercury:{ name:'Merkuriy', type:'SAYYORA',
+      desc:'Quyoshga eng yaqin va eng kichik sayyora. Atmosferasi deyarli yo‘q.',
+      dist:'57.9 mln km', dia:'4 879 km', mass:'3.30×10²³ kg', atmo:'Deyarli yo‘q', moons:'0',
+      temp:'−173°C … +427°C', period:'88 kun', day:'1 408 soat', gravity:'3.7 m/s² (0.38×)', escape:'4.3 km/s',
+      velocity:'47.4 km/s', discovered:'Qadimdan ma’lum', tilt:'0.03°', density:'5.43 g/sm³',
+      fact:'Bir quyoshli kuni ikki yiliga teng — sekin aylanadi, lekin Quyosh atrofida tez uchadi.',
+      comp:[['Kislorod',42],['Natriy',29],['Vodorod',22],['Boshqa',7]] },
+    venus:{ name:'Venera', type:'SAYYORA',
+      desc:'Qalin CO₂ atmosferasi tufayli issiqxona effekti kuchli. Teskari aylanadi.',
+      dist:'108.2 mln km', dia:'12 104 km', mass:'4.87×10²⁴ kg', atmo:'Zich CO₂', moons:'0',
+      temp:'≈ +465°C', period:'225 kun', day:'5 832 soat (teskari)', gravity:'8.9 m/s² (0.90×)', escape:'10.4 km/s',
+      velocity:'35.0 km/s', discovered:'Qadimdan ma’lum', tilt:'177.4°', density:'5.24 g/sm³',
+      fact:'Quyosh tizimidagi eng issiq sayyora — Merkuriydan ham issiqroq.',
+      comp:[['Karbonat angidrid',96.5],['Azot',3.5]] },
+    earth:{ name:'Yer', type:'SAYYORA',
+      desc:'Hayot mavjud yagona sayyora. Suyuq suv, kislorodli atmosfera va Oy bilan.',
+      dist:'149.6 mln km', dia:'12 742 km', mass:'5.97×10²⁴ kg', atmo:'N₂ + O₂', moons:'1 (Oy)',
+      temp:'≈ +15°C (o‘rtacha)', period:'365.25 kun', day:'24 soat', gravity:'9.8 m/s² (1.00×)', escape:'11.2 km/s',
+      velocity:'29.8 km/s', discovered:'—', tilt:'23.5°', density:'5.51 g/sm³',
+      fact:'Yuzasining 71% suv bilan qoplangan — kosmosdan «moviy marvarid» kabi ko‘rinadi.',
+      comp:[['Azot',78],['Kislorod',21],['Argon',1]] },
+    mars:{ name:'Mars', type:'SAYYORA',
+      desc:'Temir oksidi tufayli qizg‘ish yuzaga ega «Qizil sayyora». Kraterlar ko‘p.',
+      dist:'227.9 mln km', dia:'6 779 km', mass:'6.42×10²³ kg', atmo:'Yupqa CO₂', moons:'2 (Fobos, Deymos)',
+      temp:'≈ −65°C', period:'687 kun', day:'24.6 soat', gravity:'3.7 m/s² (0.38×)', escape:'5.0 km/s',
+      velocity:'24.1 km/s', discovered:'Qadimdan ma’lum', tilt:'25.2°', density:'3.93 g/sm³',
+      fact:'Tizimdagi eng baland tog‘ — Olimp tog‘i (22 km) shu yerda joylashgan.',
+      comp:[['Karbonat angidrid',95],['Azot',2.7],['Argon',1.6],['Boshqa',0.7]] },
+    jupiter:{ name:'Yupiter', type:'GAZ GIGANTI',
+      desc:'Eng katta sayyora — gaz giganti. Mashhur Katta Qizil Dog‘ — ulkan bo‘ron.',
+      dist:'778.5 mln km', dia:'139 820 km', mass:'1.90×10²⁷ kg', atmo:'H₂ + He', moons:'95+',
+      temp:'≈ −110°C', period:'11.9 yil', day:'9.9 soat', gravity:'24.8 m/s² (2.53×)', escape:'59.5 km/s',
+      velocity:'13.1 km/s', discovered:'Qadimdan ma’lum', tilt:'3.1°', density:'1.33 g/sm³',
+      fact:'Katta Qizil Dog‘ — 300+ yildan beri davom etayotgan, Yerdan kattaroq bo‘ron.',
+      comp:[['Vodorod',90],['Geliy',10]] },
+    saturn:{ name:'Saturn', type:'GAZ GIGANTI',
+      desc:'Ajoyib halqalari bilan mashhur. Muz va tosh bo‘laklaridan iborat halqalar.',
+      dist:'1.43 mlrd km', dia:'116 460 km', mass:'5.68×10²⁶ kg', atmo:'H₂ + He', moons:'146+',
+      temp:'≈ −140°C', period:'29.5 yil', day:'10.7 soat', gravity:'10.4 m/s² (1.07×)', escape:'35.5 km/s',
+      velocity:'9.7 km/s', discovered:'Qadimdan ma’lum', tilt:'26.7°', density:'0.69 g/sm³',
+      fact:'Zichligi suvdan kam — agar ulkan okean bo‘lsa, Saturn unda suzib yurardi.',
+      comp:[['Vodorod',96],['Geliy',3],['Boshqa',1]] },
+    uranus:{ name:'Uran', type:'MUZ GIGANTI',
+      desc:'Yonboshi bilan aylanadigan muz giganti. Metan unga ko‘kish tus beradi.',
+      dist:'2.87 mlrd km', dia:'50 724 km', mass:'8.68×10²⁵ kg', atmo:'H₂, He, CH₄', moons:'28',
+      temp:'≈ −195°C', period:'84 yil', day:'17.2 soat', gravity:'8.7 m/s² (0.89×)', escape:'21.3 km/s',
+      velocity:'6.8 km/s', discovered:'1781 (V. Herschel)', tilt:'97.8°', density:'1.27 g/sm³',
+      fact:'O‘qi 98° qiyshaygan — go‘yo «yotgan holda» Quyosh atrofida dumalab yuradi.',
+      comp:[['Vodorod',83],['Geliy',15],['Metan',2]] },
+    neptune:{ name:'Neptun', type:'MUZ GIGANTI',
+      desc:'Eng uzoq sayyora. Quyosh tizimidagi eng kuchli shamollar shu yerda.',
+      dist:'4.50 mlrd km', dia:'49 244 km', mass:'1.02×10²⁶ kg', atmo:'H₂, He, CH₄', moons:'16',
+      temp:'≈ −200°C', period:'165 yil', day:'16.1 soat', gravity:'11.2 m/s² (1.14×)', escape:'23.5 km/s',
+      velocity:'5.4 km/s', discovered:'1846 (bashorat)', tilt:'28.3°', density:'1.64 g/sm³',
+      fact:'Shamol tezligi 2 100 km/soatga yetadi — ovoz tezligidan ham tez.',
+      comp:[['Vodorod',80],['Geliy',19],['Metan',1]] },
+  }
+},
+
+/* ----------------------------- РУССКИЙ ----------------------------- */
+ru: {
+  langName:'RU',
+  tour:{
+    sun:'Наше путешествие начинается с центра — Солнца. Внутрь поместился бы миллион таких Земель, и оно своей гравитацией управляет всей системой.',
+    mercury:'Это Меркурий — маленький и быстрый. Он облетает Солнце всего за 88 дней, но днём раскаляется, а ночью замерзает.',
+    venus:'Венера — красивый, но беспощадный мир. Под плотными облаками температура плавит свинец.',
+    earth:'А вот и наш дом — Земля. Голубые океаны, белые облака и зелёные континенты. Пока единственная планета с жизнью.',
+    mars:'Красный Марс — мечта о будущем. Учёные надеются однажды увидеть здесь след человека.',
+    jupiter:'Мы рядом с гигантом Юпитером. Его Большое красное пятно — шторм, не утихающий веками.',
+    saturn:'Кольца Сатурна — красивейшее зрелище космоса. Они состоят из льда и камней.',
+    uranus:'Уран — ледяной гигант, что катится «на боку». Он не похож ни на одну другую планету.',
+    neptune:'Самый дальний Нептун — царство ветров. Здесь завершается планетная часть нашего путешествия…'
+  },
+  ui:{
+    eyebrow:'ИНТЕРАКТИВНЫЙ 3D ОПЫТ', title1:'СОЛНЕЧНАЯ', title2:'СИСТЕМА',
+    lead:'Добро пожаловать в кабину космического корабля. Путешествуйте между планетами, нажимайте на них для подробной информации и ощутите масштаб космоса.',
+    startBtn:'🚀 Начать космическое путешествие',
+    hintRotate:'🖱️ Вращение', hintZoom:'🔍 Колесо — масштаб', hintClick:'👆 Нажмите на планету',
+    brand:'СОЛНЕЧНАЯ СИСТЕМА',
+    secMain:'Основные показатели', secPhys:'Орбитальные и физические',
+    secComp:'Состав / Атмосфера', factLabel:'★ Интересный факт',
+    focusBtn:'🔭 Приблизиться', backBtn:'↺ Общий вид',
+    ringsOn:'💍 С кольцами', ringsOff:'⊘ Без колец',
+    satsOn:'🛰️ Со спутниками', satsOff:'⊘ Без спутников',
+    speedTitle:'Скорость вращения',
+    hideUI:'Скрыть интерфейс', showUI:'Показать интерфейс',
+    tourBtn:'Путешествие', tourStop:'Остановить', authorLabel:'Автор',
+    cosmosTitle:'Интересные факты о космосе',
+    cosmosFacts:[
+      'В наблюдаемой Вселенной более 100 миллиардов галактик.',
+      'Ближайшая к нам звезда — Проксима Центавра, в 4,24 светового года.',
+      'Вселенная возникла около 13,8 млрд лет назад в результате Большого взрыва.',
+      'Гравитация чёрных дыр так сильна, что даже свет не может вырваться.',
+      '95% Вселенной составляют невидимые тёмная материя и тёмная энергия.'
+    ],
+    lDist:'Расстояние от Солнца', lDia:'Диаметр', lMass:'Масса', lMoons:'Спутники',
+    lPeriod:'Период обращения', lDay:'Сутки (ось)', lGravity:'Гравитация', lEscape:'Втор. косм. скорость',
+    lVelocity:'Орбит. скорость', lTemp:'Температура', lTilt:'Наклон оси',
+    lDiscovered:'Открытие', lDensity:'Плотность'
+  },
+  bodies:{
+    sun:{ name:'Солнце', type:'ЗВЕЗДА',
+      desc:'Звезда в центре Солнечной системы. Её гравитация удерживает все планеты на орбитах.',
+      dist:'0 км (центр)', dia:'1 392 700 км', mass:'1.99×10³⁰ кг', atmo:'Плазма (H + He)', moons:'8 планет',
+      temp:'Поверхность ≈ 5 500°C', period:'—', day:'≈ 27 дней', gravity:'274 м/с² (28×)', escape:'617.5 км/с',
+      velocity:'≈ 220 км/с', discovered:'—', tilt:'7.25°', density:'1.41 г/см³',
+      fact:'Её масса составляет 99,8% всей системы. Свет от неё доходит до Земли за 8 минут.',
+      comp:[['Водород',73],['Гелий',25],['Кислород',1],['Прочее',1]] },
+    mercury:{ name:'Меркурий', type:'ПЛАНЕТА',
+      desc:'Ближайшая к Солнцу и самая маленькая планета. Атмосфера почти отсутствует.',
+      dist:'57,9 млн км', dia:'4 879 км', mass:'3.30×10²³ кг', atmo:'Почти нет', moons:'0',
+      temp:'−173°C … +427°C', period:'88 дней', day:'1 408 часов', gravity:'3.7 м/с² (0.38×)', escape:'4.3 км/с',
+      velocity:'47.4 км/с', discovered:'Известна с древности', tilt:'0.03°', density:'5.43 г/см³',
+      fact:'Один солнечный день длится два года — вращается медленно, но облетает Солнце быстро.',
+      comp:[['Кислород',42],['Натрий',29],['Водород',22],['Прочее',7]] },
+    venus:{ name:'Венера', type:'ПЛАНЕТА',
+      desc:'Из-за плотной CO₂-атмосферы силён парниковый эффект. Вращается в обратную сторону.',
+      dist:'108,2 млн км', dia:'12 104 км', mass:'4.87×10²⁴ кг', atmo:'Плотная CO₂', moons:'0',
+      temp:'≈ +465°C', period:'225 дней', day:'5 832 часа (обратно)', gravity:'8.9 м/с² (0.90×)', escape:'10.4 км/с',
+      velocity:'35.0 км/с', discovered:'Известна с древности', tilt:'177.4°', density:'5.24 г/см³',
+      fact:'Самая горячая планета системы — горячее даже Меркурия.',
+      comp:[['Углекислый газ',96.5],['Азот',3.5]] },
+    earth:{ name:'Земля', type:'ПЛАНЕТА',
+      desc:'Единственная планета с жизнью. Жидкая вода, кислородная атмосфера и Луна.',
+      dist:'149,6 млн км', dia:'12 742 км', mass:'5.97×10²⁴ кг', atmo:'N₂ + O₂', moons:'1 (Луна)',
+      temp:'≈ +15°C (в среднем)', period:'365,25 дней', day:'24 часа', gravity:'9.8 м/с² (1.00×)', escape:'11.2 км/с',
+      velocity:'29.8 км/с', discovered:'—', tilt:'23.5°', density:'5.51 г/см³',
+      fact:'71% поверхности покрыто водой — из космоса выглядит как «голубая жемчужина».',
+      comp:[['Азот',78],['Кислород',21],['Аргон',1]] },
+    mars:{ name:'Марс', type:'ПЛАНЕТА',
+      desc:'«Красная планета» с рыжей поверхностью из-за оксида железа. Много кратеров.',
+      dist:'227,9 млн км', dia:'6 779 км', mass:'6.42×10²³ кг', atmo:'Тонкая CO₂', moons:'2 (Фобос, Деймос)',
+      temp:'≈ −65°C', period:'687 дней', day:'24.6 часа', gravity:'3.7 м/с² (0.38×)', escape:'5.0 км/с',
+      velocity:'24.1 км/с', discovered:'Известна с древности', tilt:'25.2°', density:'3.93 г/см³',
+      fact:'Здесь находится самая высокая гора системы — Олимп (22 км).',
+      comp:[['Углекислый газ',95],['Азот',2.7],['Аргон',1.6],['Прочее',0.7]] },
+    jupiter:{ name:'Юпитер', type:'ГАЗОВЫЙ ГИГАНТ',
+      desc:'Самая большая планета — газовый гигант. Знаменитое Большое красное пятно — гигантский шторм.',
+      dist:'778,5 млн км', dia:'139 820 км', mass:'1.90×10²⁷ кг', atmo:'H₂ + He', moons:'95+',
+      temp:'≈ −110°C', period:'11,9 лет', day:'9.9 часов', gravity:'24.8 м/с² (2.53×)', escape:'59.5 км/с',
+      velocity:'13.1 км/с', discovered:'Известна с древности', tilt:'3.1°', density:'1.33 г/см³',
+      fact:'Большое красное пятно — шторм крупнее Земли, бушующий более 300 лет.',
+      comp:[['Водород',90],['Гелий',10]] },
+    saturn:{ name:'Сатурн', type:'ГАЗОВЫЙ ГИГАНТ',
+      desc:'Знаменит великолепными кольцами из льда и камней.',
+      dist:'1,43 млрд км', dia:'116 460 км', mass:'5.68×10²⁶ кг', atmo:'H₂ + He', moons:'146+',
+      temp:'≈ −140°C', period:'29,5 лет', day:'10.7 часов', gravity:'10.4 м/с² (1.07×)', escape:'35.5 км/с',
+      velocity:'9.7 км/с', discovered:'Известна с древности', tilt:'26.7°', density:'0.69 г/см³',
+      fact:'Его плотность меньше воды — в огромном океане Сатурн бы плавал.',
+      comp:[['Водород',96],['Гелий',3],['Прочее',1]] },
+    uranus:{ name:'Уран', type:'ЛЕДЯНОЙ ГИГАНТ',
+      desc:'Ледяной гигант, вращающийся «на боку». Метан придаёт ему голубоватый цвет.',
+      dist:'2,87 млрд км', dia:'50 724 км', mass:'8.68×10²⁵ кг', atmo:'H₂, He, CH₄', moons:'28',
+      temp:'≈ −195°C', period:'84 года', day:'17.2 часов', gravity:'8.7 м/с² (0.89×)', escape:'21.3 км/с',
+      velocity:'6.8 км/с', discovered:'1781 (В. Гершель)', tilt:'97.8°', density:'1.27 г/см³',
+      fact:'Ось наклонена на 98° — он буквально «катится лёжа» вокруг Солнца.',
+      comp:[['Водород',83],['Гелий',15],['Метан',2]] },
+    neptune:{ name:'Нептун', type:'ЛЕДЯНОЙ ГИГАНТ',
+      desc:'Самая далёкая планета. Здесь дуют сильнейшие ветры Солнечной системы.',
+      dist:'4,50 млрд км', dia:'49 244 км', mass:'1.02×10²⁶ кг', atmo:'H₂, He, CH₄', moons:'16',
+      temp:'≈ −200°C', period:'165 лет', day:'16.1 часов', gravity:'11.2 м/с² (1.14×)', escape:'23.5 км/с',
+      velocity:'5.4 км/с', discovered:'1846 (предсказана)', tilt:'28.3°', density:'1.64 г/см³',
+      fact:'Скорость ветра достигает 2100 км/ч — быстрее скорости звука.',
+      comp:[['Водород',80],['Гелий',19],['Метан',1]] },
+  }
+},
+
+/* ----------------------------- ENGLISH ----------------------------- */
+en: {
+  langName:'EN',
+  tour:{
+    sun:'Our journey begins at the centre — the Sun. A million Earths would fit inside it, and its gravity rules the entire system.',
+    mercury:'This is Mercury — small and swift. It circles the Sun in just 88 days, yet scorches by day and freezes by night.',
+    venus:'Venus — a beautiful but merciless world. Beneath its thick clouds the heat could melt lead.',
+    earth:'And here is home — Earth. Blue oceans, white clouds and green continents. So far the only planet known to host life.',
+    mars:'Red Mars — a dream of the future. Scientists hope to one day see a human footprint here.',
+    jupiter:'We are beside the giant Jupiter. Its Great Red Spot is a storm that has raged for centuries.',
+    saturn:'Saturn’s rings are the most beautiful sight in the cosmos, made of ice and rock.',
+    uranus:'Uranus — an ice giant rolling on its side. It is like no other planet.',
+    neptune:'Distant Neptune — a realm of winds. Here the planetary part of our journey comes to an end…'
+  },
+  ui:{
+    eyebrow:'INTERACTIVE 3D EXPERIENCE', title1:'SOLAR', title2:'SYSTEM',
+    lead:'Welcome aboard the spacecraft. Travel between the planets, click them for detailed information and feel the scale of the cosmos.',
+    startBtn:'🚀 Start the space journey',
+    hintRotate:'🖱️ Rotate', hintZoom:'🔍 Wheel — zoom', hintClick:'👆 Click a planet',
+    brand:'SOLAR SYSTEM',
+    secMain:'Key figures', secPhys:'Orbital & physical',
+    secComp:'Composition / Atmosphere', factLabel:'★ Fun fact',
+    focusBtn:'🔭 Zoom in', backBtn:'↺ Overview',
+    ringsOn:'💍 With rings', ringsOff:'⊘ No rings',
+    satsOn:'🛰️ With satellites', satsOff:'⊘ No satellites',
+    speedTitle:'Rotation speed',
+    hideUI:'Hide interface', showUI:'Show interface',
+    tourBtn:'Tour', tourStop:'Stop tour', authorLabel:'Author',
+    cosmosTitle:'Fascinating facts about the cosmos',
+    cosmosFacts:[
+      'There are over 100 billion galaxies in the observable universe.',
+      'The nearest star, Proxima Centauri, is 4.24 light-years away.',
+      'The universe began about 13.8 billion years ago in the Big Bang.',
+      'A black hole’s gravity is so strong that not even light can escape.',
+      '95% of the universe is made of invisible dark matter and dark energy.'
+    ],
+    lDist:'Distance from Sun', lDia:'Diameter', lMass:'Mass', lMoons:'Moons',
+    lPeriod:'Orbital period', lDay:'Day (rotation)', lGravity:'Gravity', lEscape:'Escape velocity',
+    lVelocity:'Orbital speed', lTemp:'Temperature', lTilt:'Axial tilt',
+    lDiscovered:'Discovered', lDensity:'Density'
+  },
+  bodies:{
+    sun:{ name:'Sun', type:'STAR',
+      desc:'The star at the centre of the Solar System. Its gravity holds all the planets in their orbits.',
+      dist:'0 km (centre)', dia:'1,392,700 km', mass:'1.99×10³⁰ kg', atmo:'Plasma (H + He)', moons:'8 planets',
+      temp:'Surface ≈ 5,500°C', period:'—', day:'≈ 27 days', gravity:'274 m/s² (28×)', escape:'617.5 km/s',
+      velocity:'≈ 220 km/s', discovered:'—', tilt:'7.25°', density:'1.41 g/cm³',
+      fact:'It makes up 99.8% of the system’s mass. Its light reaches Earth in about 8 minutes.',
+      comp:[['Hydrogen',73],['Helium',25],['Oxygen',1],['Other',1]] },
+    mercury:{ name:'Mercury', type:'PLANET',
+      desc:'The closest planet to the Sun and the smallest. It has almost no atmosphere.',
+      dist:'57.9 million km', dia:'4,879 km', mass:'3.30×10²³ kg', atmo:'Almost none', moons:'0',
+      temp:'−173°C … +427°C', period:'88 days', day:'1,408 hours', gravity:'3.7 m/s² (0.38×)', escape:'4.3 km/s',
+      velocity:'47.4 km/s', discovered:'Known since antiquity', tilt:'0.03°', density:'5.43 g/cm³',
+      fact:'One solar day lasts two years — it spins slowly but orbits the Sun quickly.',
+      comp:[['Oxygen',42],['Sodium',29],['Hydrogen',22],['Other',7]] },
+    venus:{ name:'Venus', type:'PLANET',
+      desc:'A thick CO₂ atmosphere drives a runaway greenhouse effect. It rotates backwards.',
+      dist:'108.2 million km', dia:'12,104 km', mass:'4.87×10²⁴ kg', atmo:'Dense CO₂', moons:'0',
+      temp:'≈ +465°C', period:'225 days', day:'5,832 hours (retrograde)', gravity:'8.9 m/s² (0.90×)', escape:'10.4 km/s',
+      velocity:'35.0 km/s', discovered:'Known since antiquity', tilt:'177.4°', density:'5.24 g/cm³',
+      fact:'The hottest planet in the system — even hotter than Mercury.',
+      comp:[['Carbon dioxide',96.5],['Nitrogen',3.5]] },
+    earth:{ name:'Earth', type:'PLANET',
+      desc:'The only planet known to harbour life. Liquid water, an oxygen atmosphere and the Moon.',
+      dist:'149.6 million km', dia:'12,742 km', mass:'5.97×10²⁴ kg', atmo:'N₂ + O₂', moons:'1 (Moon)',
+      temp:'≈ +15°C (avg)', period:'365.25 days', day:'24 hours', gravity:'9.8 m/s² (1.00×)', escape:'11.2 km/s',
+      velocity:'29.8 km/s', discovered:'—', tilt:'23.5°', density:'5.51 g/cm³',
+      fact:'71% of its surface is covered by water — it looks like a “blue marble” from space.',
+      comp:[['Nitrogen',78],['Oxygen',21],['Argon',1]] },
+    mars:{ name:'Mars', type:'PLANET',
+      desc:'The “Red Planet”, coloured by iron oxide. Its surface is heavily cratered.',
+      dist:'227.9 million km', dia:'6,779 km', mass:'6.42×10²³ kg', atmo:'Thin CO₂', moons:'2 (Phobos, Deimos)',
+      temp:'≈ −65°C', period:'687 days', day:'24.6 hours', gravity:'3.7 m/s² (0.38×)', escape:'5.0 km/s',
+      velocity:'24.1 km/s', discovered:'Known since antiquity', tilt:'25.2°', density:'3.93 g/cm³',
+      fact:'It hosts the tallest mountain in the system — Olympus Mons (22 km).',
+      comp:[['Carbon dioxide',95],['Nitrogen',2.7],['Argon',1.6],['Other',0.7]] },
+    jupiter:{ name:'Jupiter', type:'GAS GIANT',
+      desc:'The largest planet — a gas giant. Famous for the Great Red Spot, a giant storm.',
+      dist:'778.5 million km', dia:'139,820 km', mass:'1.90×10²⁷ kg', atmo:'H₂ + He', moons:'95+',
+      temp:'≈ −110°C', period:'11.9 years', day:'9.9 hours', gravity:'24.8 m/s² (2.53×)', escape:'59.5 km/s',
+      velocity:'13.1 km/s', discovered:'Known since antiquity', tilt:'3.1°', density:'1.33 g/cm³',
+      fact:'The Great Red Spot is a storm larger than Earth that has raged for 300+ years.',
+      comp:[['Hydrogen',90],['Helium',10]] },
+    saturn:{ name:'Saturn', type:'GAS GIANT',
+      desc:'Famous for its spectacular rings made of ice and rock.',
+      dist:'1.43 billion km', dia:'116,460 km', mass:'5.68×10²⁶ kg', atmo:'H₂ + He', moons:'146+',
+      temp:'≈ −140°C', period:'29.5 years', day:'10.7 hours', gravity:'10.4 m/s² (1.07×)', escape:'35.5 km/s',
+      velocity:'9.7 km/s', discovered:'Known since antiquity', tilt:'26.7°', density:'0.69 g/cm³',
+      fact:'Its density is lower than water — Saturn would float in a giant ocean.',
+      comp:[['Hydrogen',96],['Helium',3],['Other',1]] },
+    uranus:{ name:'Uranus', type:'ICE GIANT',
+      desc:'An ice giant that rotates on its side. Methane gives it a bluish tint.',
+      dist:'2.87 billion km', dia:'50,724 km', mass:'8.68×10²⁵ kg', atmo:'H₂, He, CH₄', moons:'28',
+      temp:'≈ −195°C', period:'84 years', day:'17.2 hours', gravity:'8.7 m/s² (0.89×)', escape:'21.3 km/s',
+      velocity:'6.8 km/s', discovered:'1781 (W. Herschel)', tilt:'97.8°', density:'1.27 g/cm³',
+      fact:'Its axis is tilted 98° — it essentially rolls around the Sun on its side.',
+      comp:[['Hydrogen',83],['Helium',15],['Methane',2]] },
+    neptune:{ name:'Neptune', type:'ICE GIANT',
+      desc:'The farthest planet. It has the strongest winds in the Solar System.',
+      dist:'4.50 billion km', dia:'49,244 km', mass:'1.02×10²⁶ kg', atmo:'H₂, He, CH₄', moons:'16',
+      temp:'≈ −200°C', period:'165 years', day:'16.1 hours', gravity:'11.2 m/s² (1.14×)', escape:'23.5 km/s',
+      velocity:'5.4 km/s', discovered:'1846 (predicted)', tilt:'28.3°', density:'1.64 g/cm³',
+      fact:'Wind speeds reach 2,100 km/h — faster than the speed of sound.',
+      comp:[['Hydrogen',80],['Helium',19],['Methane',1]] },
+  }
+}
+
+};
+
+</script>
+</head>
+<body>
+  <!-- 3D sahna shu canvasga chiziladi -->
+  <canvas id="scene"></canvas>
+
+  <!-- Yuklanish ekrani -->
+  <div id="loader">
+    <div class="loader-core"></div>
+    <p>Koinot yuklanmoqda…</p>
+  </div>
+
+  <!-- Kirish (Intro) ekrani -->
+  <div id="intro" class="hidden">
+    <div class="lang-switch" id="introLang"></div>
+    <div class="intro-inner">
+      <p class="eyebrow" data-i18n="eyebrow">INTERAKTIV 3D TAJRIBA</p>
+      <h1><span data-i18n="title1">QUYOSH</span><span data-i18n="title2">TIZIMI</span></h1>
+      <a id="introAuthor" class="author-link" href="https://najmiddinovanihona-hub.github.io/portfolio.html/" target="_blank" rel="noopener">Nihona Najmiddinova Irshodovna</a>
+      <p class="lead" data-i18n="lead"></p>
+      <button id="startBtn" data-i18n="startBtn">🚀 Kosmik sayohatni boshlash</button>
+      <div class="hint-row">
+        <span data-i18n="hintRotate"></span>
+        <span data-i18n="hintZoom"></span>
+        <span data-i18n="hintClick"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yuqori boshqaruv paneli -->
+  <header id="topbar" class="glass hidden">
+    <div class="brand">
+      <span class="dot"></span>
+      <span data-i18n="brand">QUYOSH TIZIMI</span>
+    </div>
+    <div class="controls">
+      <button id="tourBtn" class="icon-btn" title="Sayohat">✈</button>
+      <div class="speed-ctl">
+        <button id="pauseBtn" class="icon-btn" title="To‘xtatish / davom ettirish">⏸</button>
+        <input id="speed" type="range" min="0" max="3" step="0.1" value="1" />
+        <span id="speedVal">1.0×</span>
+      </div>
+      <div class="lang-switch" id="topLang"></div>
+      <button id="resetBtn" class="icon-btn" title="Overview">⤢</button>
+    </div>
+  </header>
+
+  <!-- Muallif yozuvi -->
+  <a id="credit" href="https://najmiddinovanihona-hub.github.io/portfolio.html/" target="_blank" rel="noopener"><span class="credit-star">✦</span> <span id="creditLabel">Muallif</span>: Nihona Najmiddinova Irshodovna</a>
+
+  <!-- Sayyora nomlari uchun pastki tezkor menyu -->
+  <nav id="dock" class="glass hidden"></nav>
+
+  <!-- Interfeysni yashirish/ko‘rsatish (kinematik ko‘rinish uchun) -->
+  <button id="uiToggle" class="ui-toggle hidden" title="Interfeysni yashirish">👁</button>
+
+  <!-- O‘ng tomondagi ma'lumot paneli -->
+  <aside id="panel" class="glass">
+    <button id="panelClose" class="panel-close">✕</button>
+    <div class="panel-head">
+      <span id="panelType">SAYYORA</span>
+      <h2 id="panelName">—</h2>
+    </div>
+    <p id="panelDesc" class="panel-desc"></p>
+    <div class="panel-actions" id="panelActions"></div>
+    <div id="panelStats" class="stats"></div>
+    <div class="fact">
+      <span class="fact-label" id="factLabel">★ Qiziqarli fakt</span>
+      <p id="panelFact"></p>
+    </div>
+  </aside>
+
+  <!-- Sayohat paytidagi hikoya matni -->
+  <div id="tourCaption">
+    <div class="tc-card glass">
+      <span id="tcName" class="tc-name"></span>
+      <p id="tcText" class="tc-text"></p>
+    </div>
+  </div>
+
+  <!-- Koinot faktlari modali (sayohat oxirida) -->
+  <div id="cosmos" class="cosmos-overlay">
+    <div class="cosmos-card glass">
+      <button id="cosmosClose" class="panel-close">✕</button>
+      <div class="cosmos-eyebrow">✦ ✦ ✦</div>
+      <h2 id="cosmosTitle">Koinot haqida qiziqarli faktlar</h2>
+      <ul id="cosmosList"></ul>
+    </div>
+  </div>
+
+  <script>
+/* ==========================================================================
+   QUYOSH TIZIMI — 3D Interaktiv tajriba
+   Three.js (r128) yordamida. Barcha teksturalar protsedural (canvas) tarzda
+   generatsiya qilinadi — internet rasmlariga bog‘liq emas, offlayn ishlaydi.
+   ========================================================================== */
+
+(() => {
+'use strict';
+
+/* --------------------------------------------------------------------------
+   0. ASOSIY O‘RNATISH (renderer, sahna, kamera, boshqaruv)
+   -------------------------------------------------------------------------- */
+const canvas   = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputEncoding   = THREE.sRGBEncoding;
+renderer.toneMapping      = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+// Fon mutlaqo qora emas — chuqur ko‘k-binafsha kosmos tusi
+scene.background = new THREE.Color(0x05060f);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 8000);
+camera.position.set(0, 90, 320);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;     // silliq harakat
+controls.dampingFactor  = 0.06;
+controls.rotateSpeed     = 0.55;
+controls.zoomSpeed       = 0.9;
+controls.minDistance     = 14;
+controls.maxDistance     = 3400;   // galaktikalargacha uzoqlashish mumkin
+controls.target.set(0, 0, 0);
+
+const clock = new THREE.Clock();
+
+/* --------------------------------------------------------------------------
+   I18N — til holati (UZ / RU / EN) va yordamchilar
+   -------------------------------------------------------------------------- */
+let LANG = localStorage.getItem('solar_lang') || 'uz';
+if(!window.LOC[LANG]) LANG = 'uz';
+const tUI = (k) => (window.LOC[LANG].ui[k] ?? k);
+const bodyData = (key) => window.LOC[LANG].bodies[key];
+let lastSelectedKey = null;   // panel ochilganda qaysi obyekt
+
+/* --------------------------------------------------------------------------
+   1. PROTSEDURAL TEKSTURA GENERATORLARI
+   -------------------------------------------------------------------------- */
+function makeCanvas(w, h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return c;
+}
+function asTexture(canvas, srgb = true){
+  const t = new THREE.CanvasTexture(canvas);
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  if (srgb) t.encoding = THREE.sRGBEncoding;
+  return t;
+}
+// fBm-ga o‘xshash shovqin: ko‘p qatlamli yarim shaffof dog‘lar
+function speckle(ctx, w, h, count, colorFn, rMin, rMax){
+  for (let i=0;i<count;i++){
+    const x = Math.random()*w, y = Math.random()*h;
+    const r = rMin + Math.random()*(rMax-rMin);
+    ctx.fillStyle = colorFn();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+// Toshli sayyora (Merkuriy, Venera, Mars) uchun umumiy generator
+function rockyTexture(base, shades, craterCount){
+  const w=1024, h=512, c=makeCanvas(w,h), ctx=c.getContext('2d');
+  ctx.fillStyle = base; ctx.fillRect(0,0,w,h);
+  // rang variatsiyasi
+  shades.forEach(s=>{
+    ctx.globalAlpha = 0.5;
+    speckle(ctx, w, h, 260, ()=>s, 6, 40);
+  });
+  ctx.globalAlpha = 0.25;
+  speckle(ctx, w, h, 2000, ()=>'rgba(0,0,0,0.4)', 1, 4);
+  // kraterlar
+  ctx.globalAlpha = 1;
+  for (let i=0;i<craterCount;i++){
+    const x=Math.random()*w, y=Math.random()*h, r=3+Math.random()*16;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x-r*0.25,y-r*0.25,r*0.7,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.10)'; ctx.fill();
+  }
+  return asTexture(c);
+}
+
+// Gaz giganti (Yupiter, Saturn, Uran, Neptun) — gorizontal chiziqlar
+function gasGiantTexture(bands, opts={}){
+  const w=1024, h=512, c=makeCanvas(w,h), ctx=c.getContext('2d');
+  let y=0;
+  const total = bands.reduce((s,b)=>s+(b.size||1),0);
+  bands.forEach(b=>{
+    const bh = h*(b.size||1)/total;
+    const g = ctx.createLinearGradient(0,y,0,y+bh);
+    g.addColorStop(0, b.c1); g.addColorStop(1, b.c2 || b.c1);
+    ctx.fillStyle=g; ctx.fillRect(0,y,w,bh);
+    // turbulentlik — gorizontal cho‘zilgan dog‘lar
+    ctx.globalAlpha=0.18;
+    for(let i=0;i<40;i++){
+      ctx.fillStyle = Math.random()>0.5 ? '#ffffff' : '#000000';
+      const ex=Math.random()*w, ey=y+Math.random()*bh;
+      ctx.beginPath();
+      ctx.ellipse(ex,ey, 20+Math.random()*70, 2+Math.random()*5, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    y+=bh;
+  });
+  // Yupiterning Katta Qizil Dog‘i
+  if (opts.redSpot){
+    ctx.save();
+    ctx.translate(w*0.72, h*0.62);
+    ctx.scale(1.6,1);
+    const g = ctx.createRadialGradient(0,0,2, 0,0,60);
+    g.addColorStop(0,'#e8643a'); g.addColorStop(0.6,'#c4452a'); g.addColorStop(1,'rgba(160,60,40,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,60,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  return asTexture(c);
+}
+
+// Qit'a maskasi — Yer kunduzi/kechasi uchun
+function continentMask(w,h){
+  const c=makeCanvas(w,h), ctx=c.getContext('2d');
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#fff';
+  // tasodifiy "qit'a" blob-lari
+  for(let i=0;i<14;i++){
+    const cx=Math.random()*w, cy=h*0.25+Math.random()*h*0.5;
+    const pts=8+Math.floor(Math.random()*5);
+    ctx.beginPath();
+    for(let p=0;p<pts;p++){
+      const a=p/pts*Math.PI*2;
+      const rad=(30+Math.random()*90);
+      const x=cx+Math.cos(a)*rad*(1.4), y=cy+Math.sin(a)*rad;
+      p? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+    }
+    ctx.closePath(); ctx.fill();
+  }
+  return c;
+}
+
+let earthMask = null;
+function earthDayTexture(){
+  const w=1024,h=512,c=makeCanvas(w,h),ctx=c.getContext('2d');
+  // okean
+  const og=ctx.createLinearGradient(0,0,0,h);
+  og.addColorStop(0,'#0a2a5e'); og.addColorStop(.5,'#0e4b8a'); og.addColorStop(1,'#0a2a5e');
+  ctx.fillStyle=og; ctx.fillRect(0,0,w,h);
+  // qit'alar
+  if(!earthMask) earthMask = continentMask(w,h);
+  const mctx = earthMask.getContext('2d');
+  const data = mctx.getImageData(0,0,w,h).data;
+  const land = ctx.getImageData(0,0,w,h);
+  for(let i=0;i<data.length;i+=4){
+    if(data[i]>128){
+      // o‘simlik yoki cho‘l
+      const desert = Math.random()>0.65;
+      land.data[i]   = desert?150:42;
+      land.data[i+1] = desert?125:110;
+      land.data[i+2] = desert?70:48;
+    }
+  }
+  ctx.putImageData(land,0,0);
+  // qutb muzliklari
+  ctx.fillStyle='rgba(240,248,255,0.9)';
+  ctx.fillRect(0,0,w,h*0.06); ctx.fillRect(0,h*0.94,w,h*0.06);
+  ctx.globalAlpha=0.5; speckle(ctx,w,h,1500,()=>'rgba(255,255,255,0.06)',1,3); ctx.globalAlpha=1;
+  return asTexture(c);
+}
+function earthNightTexture(){
+  const w=1024,h=512,c=makeCanvas(w,h),ctx=c.getContext('2d');
+  ctx.fillStyle='#01030a'; ctx.fillRect(0,0,w,h);
+  if(!earthMask) earthMask = continentMask(w,h);
+  const data = earthMask.getContext('2d').getImageData(0,0,w,h).data;
+  // qit'alar ustida shahar chiroqlari
+  for(let i=0;i<26000;i++){
+    const x=Math.floor(Math.random()*w), y=Math.floor(Math.random()*h);
+    const idx=(y*w+x)*4;
+    if(data[idx]>128 && y>h*0.08 && y<h*0.92){
+      const b=Math.random();
+      ctx.fillStyle = b>0.85 ? 'rgba(255,240,190,0.95)' : 'rgba(255,205,120,0.6)';
+      ctx.fillRect(x,y,1,1);
+    }
+  }
+  return asTexture(c);
+}
+function cloudTexture(){
+  const w=1024,h=512,c=makeCanvas(w,h),ctx=c.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  for(let i=0;i<120;i++){
+    const x=Math.random()*w, y=Math.random()*h, r=20+Math.random()*70;
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba(255,255,255,'+(0.5+Math.random()*0.4)+')');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+  return asTexture(c, false);
+}
+
+// Saturn halqalari — radial tekstura (alfa kanali bilan)
+function ringTexture(){
+  const sz=1024, c=makeCanvas(sz,sz), ctx=c.getContext('2d');
+  ctx.clearRect(0,0,sz,sz);
+  const cx=sz/2, cy=sz/2;
+  for(let r=sz*0.30; r<sz*0.5; r+=1){
+    const t=(r-sz*0.30)/(sz*0.2);
+    // bo‘shliqlar (Cassini) va zichlik o‘zgarishi
+    let a = 0.55 + 0.35*Math.sin(r*0.4) + (Math.random()*0.1);
+    if(t>0.45 && t<0.5) a*=0.15;          // Cassini bo‘shlig‘i
+    if(t<0.05) a*=0.3;
+    a = Math.max(0, Math.min(0.9, a));
+    const shade = 180 + Math.floor(40*Math.sin(r*0.2));
+    ctx.strokeStyle=`rgba(${shade},${shade-25},${shade-70},${a})`;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  }
+  return asTexture(c, false);
+}
+
+// Yumshoq dumaloq nuqta (yulduz/zarra sprite-i)
+function dotTexture(){
+  const s=64,c=makeCanvas(s,s),ctx=c.getContext('2d');
+  const g=ctx.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(0.2,'rgba(255,255,255,0.8)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,s,s);
+  return asTexture(c,false);
+}
+const SPRITE = dotTexture();
+
+// Tumanlik (nebula) bulutli teksturasi
+function nebulaTexture(tint){
+  const s=512,c=makeCanvas(s,s),ctx=c.getContext('2d');
+  ctx.clearRect(0,0,s,s);
+  for(let i=0;i<60;i++){
+    const x=Math.random()*s,y=Math.random()*s,r=40+Math.random()*150;
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,tint.replace('A', (0.05+Math.random()*0.12).toFixed(2)));
+    g.addColorStop(1,tint.replace('A','0'));
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+  // chetlarini yo‘qqa chiqaruvchi radial niqob (kvadrat ko‘rinmasligi uchun)
+  ctx.globalCompositeOperation='destination-in';
+  const vg=ctx.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  vg.addColorStop(0,'rgba(0,0,0,1)'); vg.addColorStop(0.65,'rgba(0,0,0,0.9)');
+  vg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,s,s);
+  ctx.globalCompositeOperation='source-over';
+  return asTexture(c,false);
+}
+
+/* --------------------------------------------------------------------------
+   2. YULDUZLAR, TUMANLIKLAR, GALAKTIKALAR, KOSMIK CHANG
+   -------------------------------------------------------------------------- */
+function buildStarLayer(count, radius, size, opacity){
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count*3);
+  const col = new Float32Array(count*3);
+  const palette = [
+    [1,1,1],[0.8,0.85,1],[1,0.9,0.75],[0.7,0.8,1],[1,0.8,0.7]
+  ];
+  for(let i=0;i<count;i++){
+    // sferada teng taqsimot
+    const u=Math.random(), v=Math.random();
+    const theta=2*Math.PI*u, phi=Math.acos(2*v-1);
+    const r=radius*(0.7+Math.random()*0.3);
+    pos[i*3]  =r*Math.sin(phi)*Math.cos(theta);
+    pos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
+    pos[i*3+2]=r*Math.cos(phi);
+    const cc=palette[Math.floor(Math.random()*palette.length)];
+    const b=0.6+Math.random()*0.4;
+    col[i*3]=cc[0]*b; col[i*3+1]=cc[1]*b; col[i*3+2]=cc[2]*b;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col,3));
+  const mat = new THREE.PointsMaterial({
+    size, map:SPRITE, vertexColors:true, transparent:true, opacity,
+    depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true
+  });
+  return new THREE.Points(geo, mat);
+}
+// Parallaks uchun ikki qatlam (turli tezlikda aylanadi)
+const starsFar  = buildStarLayer(6000, 3000, 6, 0.9);
+const starsNear = buildStarLayer(3000, 1800, 9, 0.8);
+scene.add(starsFar, starsNear);
+
+// Tumanliklar (nebula) — katta shaffof tekisliklar
+const nebulaGroup = new THREE.Group();
+const nebTints = ['rgba(90,120,255,A)','rgba(160,80,220,A)','rgba(60,180,200,A)','rgba(220,90,160,A)'];
+for(let i=0;i<8;i++){
+  const tex = nebulaTexture(nebTints[i%nebTints.length]);
+  const mat = new THREE.SpriteMaterial({ map:tex, transparent:true, opacity:0.55,
+    blending:THREE.AdditiveBlending, depthWrite:false });
+  const sp = new THREE.Sprite(mat);
+  const d=1400+Math.random()*1200;
+  const a=Math.random()*Math.PI*2, b=(Math.random()-0.5)*1.2;
+  sp.position.set(Math.cos(a)*d, b*d*0.5, Math.sin(a)*d);
+  const s=500+Math.random()*700; sp.scale.set(s,s,1);
+  nebulaGroup.add(sp);
+}
+scene.add(nebulaGroup);
+
+// Uzoq galaktikalar — spiral his beruvchi sprite-lar
+function galaxyTexture(){
+  const s=256,c=makeCanvas(s,s),ctx=c.getContext('2d');
+  ctx.clearRect(0,0,s,s); ctx.translate(s/2,s/2);
+  for(let arm=0;arm<2;arm++){
+    for(let i=0;i<400;i++){
+      const t=i/400, ang=arm*Math.PI + t*6, rad=t*s*0.45;
+      const x=Math.cos(ang)*rad, y=Math.sin(ang)*rad*0.5;
+      ctx.fillStyle=`rgba(${200+Math.random()*55},${190+Math.random()*40},255,${0.4*(1-t)})`;
+      ctx.beginPath(); ctx.arc(x,y,1.5*(1-t)+0.5,0,Math.PI*2); ctx.fill();
+    }
+  }
+  const g=ctx.createRadialGradient(0,0,0,0,0,40);
+  g.addColorStop(0,'rgba(255,250,230,0.9)'); g.addColorStop(1,'rgba(255,250,230,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,40,0,Math.PI*2); ctx.fill();
+  return asTexture(c,false);
+}
+for(let i=0;i<4;i++){
+  const m=new THREE.SpriteMaterial({ map:galaxyTexture(), transparent:true, opacity:0.7,
+    blending:THREE.AdditiveBlending, depthWrite:false });
+  const sp=new THREE.Sprite(m);
+  const d=2200+Math.random()*600, a=Math.random()*Math.PI*2;
+  sp.position.set(Math.cos(a)*d,(Math.random()-0.5)*900,Math.sin(a)*d);
+  const s=260+Math.random()*220; sp.scale.set(s,s,1);
+  scene.add(sp);
+}
+
+// Harakatlanuvchi kosmik chang
+const dustGeo=new THREE.BufferGeometry();
+const dustN=900, dpos=new Float32Array(dustN*3);
+for(let i=0;i<dustN;i++){
+  dpos[i*3]=(Math.random()-0.5)*900;
+  dpos[i*3+1]=(Math.random()-0.5)*500;
+  dpos[i*3+2]=(Math.random()-0.5)*900;
+}
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dpos,3));
+const dust=new THREE.Points(dustGeo, new THREE.PointsMaterial({
+  size:2, map:SPRITE, color:0x9fb4ff, transparent:true, opacity:0.5,
+  depthWrite:false, blending:THREE.AdditiveBlending }));
+scene.add(dust);
+
+/* --------------------------------------------------------------------------
+   3. QUYOSH — animatsion shader + korona + nur
+   -------------------------------------------------------------------------- */
+const SUN_RADIUS = 14;
+// 3D simplex shovqin (Ashima) — quyosh yuzasi uchun
+const NOISE_GLSL = `
+vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+  vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+  float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.0*floor(p*ns.z*ns.z);
+  vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+  vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+  vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
+  return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+float fbm(vec3 p){ float v=0.0,a=0.5; for(int i=0;i<5;i++){ v+=a*snoise(p); p*=2.0; a*=0.5;} return v;}
+`;
+const sunMat = new THREE.ShaderMaterial({
+  uniforms:{ time:{value:0} },
+  vertexShader:`
+    varying vec3 vPos;
+    void main(){ vPos=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: NOISE_GLSL + `
+    uniform float time; varying vec3 vPos;
+    void main(){
+      vec3 p=normalize(vPos)*2.2;
+      float n=fbm(p+vec3(0.0,0.0,time*0.12));
+      float n2=fbm(p*3.0-vec3(time*0.18));
+      float v=n*0.6+n2*0.4;
+      vec3 dark=vec3(0.9,0.25,0.04);
+      vec3 mid =vec3(1.0,0.55,0.10);
+      vec3 hot =vec3(1.0,0.92,0.55);
+      vec3 col=mix(dark,mid,smoothstep(-0.3,0.3,v));
+      col=mix(col,hot,smoothstep(0.25,0.7,v));
+      col+=pow(max(v,0.0),3.0)*vec3(1.0,0.7,0.3);  // alanga porlashi
+      gl_FragColor=vec4(col,1.0);
+    }`
+});
+const sun = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 64, 64), sunMat);
+sun.userData = solarData('Quyosh');
+sun.userData.key = 'sun';
+scene.add(sun);
+
+// Quyosh nuri — atrofdagi obyektlarni yoritadi
+const sunLight = new THREE.PointLight(0xffe8c0, 3.2, 0, 1.4);
+sun.add(sunLight);
+scene.add(new THREE.AmbientLight(0x223055, 0.35)); // engil to‘ldiruvchi yorug‘lik
+
+// Korona / halo — additiv sprite
+function glowTexture(){
+  const s=256,c=makeCanvas(s,s),ctx=c.getContext('2d');
+  const g=ctx.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  g.addColorStop(0,'rgba(255,230,160,0.9)');
+  g.addColorStop(0.25,'rgba(255,160,60,0.5)');
+  g.addColorStop(0.6,'rgba(255,110,40,0.15)');
+  g.addColorStop(1,'rgba(255,80,30,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,s,s);
+  return asTexture(c,false);
+}
+const corona = new THREE.Sprite(new THREE.SpriteMaterial({
+  map:glowTexture(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false }));
+corona.scale.set(SUN_RADIUS*7, SUN_RADIUS*7, 1);
+sun.add(corona);
+
+/* --------------------------------------------------------------------------
+   4. SAYYORALAR MA'LUMOTLARI (o‘zbek tilida)
+   -------------------------------------------------------------------------- */
+const PLANETS = [
+  { key:'mercury', name:'Merkuriy', type:'SAYYORA', color:0x9c8b7a,
+    radius:1.4, orbit:34, speed:0.048, spin:0.004, tilt:0.03,
+    desc:'Quyoshga eng yaqin va eng kichik sayyora. Atmosferasi deyarli yo‘q.',
+    dist:'57.9 mln km', dia:'4 879 km', mass:'3.30×10²³ kg', atmo:'Deyarli yo‘q',
+    moons:'0', temp:'−173°C … +427°C',
+    fact:'Bir kuni (quyoshli) ikki yiliga teng — sekin aylanadi, lekin Quyosh atrofida tez uchadi.' },
+
+  { key:'venus', name:'Venera', type:'SAYYORA', color:0xd8a96b,
+    radius:2.3, orbit:48, speed:0.035, spin:-0.002, tilt:3.1,
+    desc:'Qalin CO₂ atmosferasi tufayli issiqxona effekti kuchli. Teskari aylanadi.',
+    dist:'108.2 mln km', dia:'12 104 km', mass:'4.87×10²⁴ kg', atmo:'Zich CO₂',
+    moons:'0', temp:'≈ +465°C',
+    fact:'Quyosh tizimidagi eng issiq sayyora — Merkuriydan ham issiqroq.' },
+
+  { key:'earth', name:'Yer', type:'SAYYORA', color:0x3b7fd6,
+    radius:2.5, orbit:64, speed:0.029, spin:0.02, tilt:23.5, special:'earth',
+    desc:'Hayot mavjud yagona sayyora. Suyuq suv, kislorodli atmosfera va Oy bilan.',
+    dist:'149.6 mln km', dia:'12 742 km', mass:'5.97×10²⁴ kg', atmo:'N₂ + O₂',
+    moons:'1 (Oy)', temp:'≈ +15°C (o‘rtacha)',
+    fact:'Yuzasining 71% suv bilan qoplangan — kosmosdan «moviy marvarid» kabi ko‘rinadi.' },
+
+  { key:'mars', name:'Mars', type:'SAYYORA', color:0xc1502e,
+    radius:1.9, orbit:80, speed:0.024, spin:0.018, tilt:25.2,
+    desc:'Temir oksidi tufayli qizg‘ish yuzaga ega «Qizil sayyora». Kraterlar ko‘p.',
+    dist:'227.9 mln km', dia:'6 779 km', mass:'6.42×10²³ kg', atmo:'Yupqa CO₂',
+    moons:'2 (Fobos, Deymos)', temp:'≈ −65°C',
+    fact:'Tizimdagi eng baland tog‘ — Olimp tog‘i (22 km) shu yerda joylashgan.' },
+
+  { key:'jupiter', name:'Yupiter', type:'GAZ GIGANTI', color:0xd8b48a,
+    radius:7.0, orbit:120, speed:0.013, spin:0.04, tilt:3.1, special:'jupiter',
+    desc:'Eng katta sayyora — gaz giganti. Mashhur Katta Qizil Dog‘ — ulkan bo‘ron.',
+    dist:'778.5 mln km', dia:'139 820 km', mass:'1.90×10²⁷ kg', atmo:'H₂ + He',
+    moons:'95+', temp:'≈ −110°C',
+    fact:'Katta Qizil Dog‘ — 300+ yildan beri davom etayotgan, Yerdan kattaroq bo‘ron.' },
+
+  { key:'saturn', name:'Saturn', type:'GAZ GIGANTI', color:0xe0c89a,
+    radius:6.0, orbit:165, speed:0.0096, spin:0.038, tilt:26.7, special:'saturn',
+    desc:'Ajoyib halqalari bilan mashhur. Muz va tosh bo‘laklaridan iborat halqalar.',
+    dist:'1.43 mlrd km', dia:'116 460 km', mass:'5.68×10²⁶ kg', atmo:'H₂ + He',
+    moons:'146+', temp:'≈ −140°C',
+    fact:'Zichligi suvdan kam — agar ulkan okean bo‘lsa, Saturn unda suzib yurardi.' },
+
+  { key:'uranus', name:'Uran', type:'MUZ GIGANTI', color:0x9fe0e6,
+    radius:4.2, orbit:205, speed:0.0068, spin:0.03, tilt:97.8, special:'uranus',
+    desc:'Yonboshi bilan aylanadigan muz giganti. Metan unga ko‘kish tus beradi.',
+    dist:'2.87 mlrd km', dia:'50 724 km', mass:'8.68×10²⁵ kg', atmo:'H₂, He, CH₄',
+    moons:'28', temp:'≈ −195°C',
+    fact:'O‘qi 98° qiyshaygan — go‘yo «yotgan holda» Quyosh atrofida dumalab yuradi.' },
+
+  { key:'neptune', name:'Neptun', type:'MUZ GIGANTI', color:0x3b5bdb,
+    radius:4.0, orbit:240, speed:0.0054, spin:0.032, tilt:28.3,
+    desc:'Eng uzoq sayyora. Quyosh tizimidagi eng kuchli shamollar shu yerda.',
+    dist:'4.50 mlrd km', dia:'49 244 km', mass:'1.02×10²⁶ kg', atmo:'H₂, He, CH₄',
+    moons:'16', temp:'≈ −200°C',
+    fact:'Shamol tezligi 2 100 km/soatga yetadi — ovoz tezligidan ham tez.' },
+];
+
+function solarData(name){
+  return { name, type:'YULDUZ', isSun:true,
+    desc:'Quyosh tizimining markazidagi yulduz. Uning tortishish kuchi barcha sayyoralarni ushlab turadi.',
+    dist:'0 km (markaz)', dia:'1 392 700 km', mass:'1.99×10³⁰ kg', atmo:'Plazma (H + He)',
+    moons:'8 sayyora', temp:'Yuzasi ≈ 5 500°C',
+    fact:'Massasi butun tizimning 99.8% ini tashkil etadi. Yorug‘lik undan Yergacha 8 daqiqada yetadi.' };
+}
+
+/* Kengaytirilgan ma'lumotlar — fizik ko‘rsatkichlar va tarkib (atmosfera/modda) */
+const EXTRA = {
+  sun:     { period:'—', day:'≈ 27 kun', gravity:'274 m/s² (28×)', escape:'617.5 km/s', velocity:'≈ 220 km/s (Galaktika)', discovered:'—',
+             comp:[['Vodorod',73],['Geliy',25],['Kislorod',1],['Boshqa',1]] },
+  mercury: { period:'88 kun', day:'1 408 soat', gravity:'3.7 m/s² (0.38×)', escape:'4.3 km/s', velocity:'47.4 km/s', discovered:'Qadimdan ma’lum',
+             comp:[['Kislorod',42],['Natriy',29],['Vodorod',22],['Boshqa',7]] },
+  venus:   { period:'225 kun', day:'5 832 soat (teskari)', gravity:'8.9 m/s² (0.90×)', escape:'10.4 km/s', velocity:'35.0 km/s', discovered:'Qadimdan ma’lum',
+             comp:[['Karbonat angidrid',96.5],['Azot',3.5]] },
+  earth:   { period:'365.25 kun', day:'24 soat', gravity:'9.8 m/s² (1.00×)', escape:'11.2 km/s', velocity:'29.8 km/s', discovered:'—',
+             comp:[['Azot',78],['Kislorod',21],['Argon',1]] },
+  mars:    { period:'687 kun', day:'24.6 soat', gravity:'3.7 m/s² (0.38×)', escape:'5.0 km/s', velocity:'24.1 km/s', discovered:'Qadimdan ma’lum',
+             comp:[['Karbonat angidrid',95],['Azot',2.7],['Argon',1.6],['Boshqa',0.7]] },
+  jupiter: { period:'11.9 yil', day:'9.9 soat', gravity:'24.8 m/s² (2.53×)', escape:'59.5 km/s', velocity:'13.1 km/s', discovered:'Qadimdan ma’lum',
+             comp:[['Vodorod',90],['Geliy',10]] },
+  saturn:  { period:'29.5 yil', day:'10.7 soat', gravity:'10.4 m/s² (1.07×)', escape:'35.5 km/s', velocity:'9.7 km/s', discovered:'Qadimdan ma’lum',
+             comp:[['Vodorod',96],['Geliy',3],['Boshqa',1]] },
+  uranus:  { period:'84 yil', day:'17.2 soat', gravity:'8.7 m/s² (0.89×)', escape:'21.3 km/s', velocity:'6.8 km/s', discovered:'1781 (V. Herschel)',
+             comp:[['Vodorod',83],['Geliy',15],['Metan',2]] },
+  neptune: { period:'165 yil', day:'16.1 soat', gravity:'11.2 m/s² (1.14×)', escape:'23.5 km/s', velocity:'5.4 km/s', discovered:'1846 (matematik bashorat)',
+             comp:[['Vodorod',80],['Geliy',19],['Metan',1]] },
+};
+
+/* --------------------------------------------------------------------------
+   5. SAYYORALARNI QURISH (orbita, aylanish, maxsus effektlar)
+   -------------------------------------------------------------------------- */
+const planetMeshes = [];   // raycasting uchun
+const orbitObjects = [];   // animatsiya uchun
+
+function makeOrbitRing(radius){
+  const seg=180, pts=[];
+  for(let i=0;i<=seg;i++){ const a=i/seg*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius)); }
+  const g=new THREE.BufferGeometry().setFromPoints(pts);
+  const m=new THREE.LineBasicMaterial({ color:0x4a5b8a, transparent:true, opacity:0.28 });
+  return new THREE.LineLoop(g,m);
+}
+
+// Sayyora atrofidagi atmosfera/haze halqasi (fresnel, additiv)
+function addHaze(mesh, radius, colorHex, power, scale){
+  const haze = new THREE.Mesh(
+    new THREE.SphereGeometry(radius*scale, 48, 48),
+    new THREE.ShaderMaterial({
+      transparent:true, side:THREE.BackSide, blending:THREE.AdditiveBlending, depthWrite:false,
+      uniforms:{ uColor:{value:new THREE.Color(colorHex)}, uPow:{value:power} },
+      vertexShader:`varying vec3 vN; void main(){ vN=normalize(mat3(modelMatrix)*normal);
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+      fragmentShader:`uniform vec3 uColor; uniform float uPow; varying vec3 vN;
+        void main(){ float i=pow(max(0.78-dot(vN,vec3(0.0,0.0,1.0)),0.0),uPow);
+          gl_FragColor=vec4(uColor,1.0)*clamp(i,0.0,1.0);}` }));
+  mesh.add(haze);
+}
+
+// Sun'iy yo‘ldosh modeli (korpus + quyosh panellari + antenna)
+function makeSatellite(scale){
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.3),
+    new THREE.MeshStandardMaterial({ color:0xd9b96a, metalness:0.9, roughness:0.35 }));
+  g.add(body);
+  const panelMat = new THREE.MeshStandardMaterial({ color:0x1c2c66, metalness:0.6, roughness:0.4,
+    emissive:0x0a1740, emissiveIntensity:0.5, side:THREE.DoubleSide });
+  [-1,1].forEach(s=>{
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.5,0.22), panelMat);
+    panel.position.x = s*0.42; g.add(panel);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.02,0.02),
+      new THREE.MeshStandardMaterial({ color:0x888888, metalness:0.8, roughness:0.4 }));
+    arm.position.x = s*0.22; g.add(arm);
+  });
+  const dish = new THREE.Mesh(new THREE.CircleGeometry(0.1,16),
+    new THREE.MeshStandardMaterial({ color:0xeeeeee, metalness:0.3, roughness:0.6, side:THREE.DoubleSide }));
+  dish.position.set(0,0.14,0); dish.rotation.x=-0.6; g.add(dish);
+  g.scale.setScalar(scale);
+  return g;
+}
+
+PLANETS.forEach(p=>{
+  scene.add(makeOrbitRing(p.orbit));
+
+  // Orbita markazi (Quyosh atrofida aylanadi)
+  const pivot = new THREE.Object3D();
+  pivot.rotation.y = Math.random()*Math.PI*2;
+  scene.add(pivot);
+
+  // Sayyora teksturasi
+  let material;
+  if (p.special==='earth'){
+    material = new THREE.ShaderMaterial({
+      uniforms:{
+        dayTex:{value:earthDayTexture()},
+        nightTex:{value:earthNightTexture()},
+        sunDir:{value:new THREE.Vector3(1,0,0)}
+      },
+      vertexShader:`
+        varying vec2 vUv; varying vec3 vN;
+        void main(){ vUv=uv; vN=normalize(mat3(modelMatrix)*normal);
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      fragmentShader:`
+        uniform sampler2D dayTex; uniform sampler2D nightTex; uniform vec3 sunDir;
+        varying vec2 vUv; varying vec3 vN;
+        void main(){
+          float d=dot(normalize(vN), normalize(sunDir));
+          float mixf=smoothstep(-0.12,0.28,d);
+          vec3 day=texture2D(dayTex,vUv).rgb;
+          vec3 night=texture2D(nightTex,vUv).rgb*1.4;
+          vec3 col=mix(night,day,mixf);
+          gl_FragColor=vec4(col,1.0);
+        }`
+    });
+  } else {
+    let tex;
+    if (p.key==='mercury') tex=rockyTexture('#8a7a68',['#6f6052','#a89683'],90);
+    else if (p.key==='venus') tex=gasGiantTexture([
+        {c1:'#e8c98a',c2:'#d8a96b'},{c1:'#d6b074',c2:'#c89a5c'},
+        {c1:'#e3c184',c2:'#cfa566'},{c1:'#d2a45e',c2:'#e0bb7c'}]);
+    else if (p.key==='mars') tex=rockyTexture('#b04a2a',['#8f3a22','#d06a44','#6f2e1c'],110);
+    else if (p.key==='jupiter') tex=gasGiantTexture([
+        {c1:'#d8c4a0',c2:'#c9a877'},{c1:'#b98c5a',c2:'#a67a48'},
+        {c1:'#e0d2b4',c2:'#cdb389'},{c1:'#a87648',c2:'#946539'},
+        {c1:'#ddc9a4',c2:'#c7a472'},{c1:'#b3895a',c2:'#9c7344'}],{redSpot:true});
+    else if (p.key==='saturn') tex=gasGiantTexture([
+        {c1:'#e8d6ac',c2:'#dcc796'},{c1:'#cfb47e',c2:'#c4a86f'},
+        {c1:'#e3d3a3',c2:'#d6c187'},{c1:'#c9ad72',c2:'#dac38a'}]);
+    else if (p.key==='uranus') tex=gasGiantTexture([
+        {c1:'#bfeef0',c2:'#a6e2e8'},{c1:'#9fe0e6',c2:'#8fd6dd'},
+        {c1:'#b4eaee',c2:'#a0e0e6'}]);
+    else if (p.key==='neptune') tex=gasGiantTexture([
+        {c1:'#4a6be0',c2:'#3b5bdb'},{c1:'#345bd0',c2:'#2e4fc4'},
+        {c1:'#4f70e6',c2:'#3d5dd8'},{c1:'#2c4ec0',c2:'#3a5ad4'}]);
+    material = new THREE.MeshStandardMaterial({ map:tex, roughness:0.9, metalness:0.05 });
+  }
+
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.radius, 48, 48), material);
+  mesh.position.x = p.orbit;
+  mesh.rotation.z = THREE.MathUtils.degToRad(p.tilt);
+  mesh.userData = p;
+  pivot.add(mesh);
+  planetMeshes.push(mesh);
+
+  const rec = { ...p, mesh, pivot, extras:{} };
+
+  // --- Maxsus effektlar ---
+  if (p.special==='earth'){
+    // Bulutlar
+    const clouds = new THREE.Mesh(
+      new THREE.SphereGeometry(p.radius*1.02, 48, 48),
+      new THREE.MeshStandardMaterial({ map:cloudTexture(), transparent:true, opacity:0.55, depthWrite:false }));
+    mesh.add(clouds); rec.extras.clouds = clouds;
+    // Atmosfera (fresnel halo)
+    const atmo = new THREE.Mesh(
+      new THREE.SphereGeometry(p.radius*1.18, 48, 48),
+      new THREE.ShaderMaterial({
+        transparent:true, side:THREE.BackSide, blending:THREE.AdditiveBlending, depthWrite:false,
+        vertexShader:`varying vec3 vN; void main(){ vN=normalize(mat3(modelMatrix)*normal);
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+        fragmentShader:`varying vec3 vN;
+          void main(){ float i=pow(0.7-dot(vN,vec3(0.0,0.0,1.0)),2.0);
+            gl_FragColor=vec4(0.3,0.6,1.0,1.0)*clamp(i,0.0,1.0);}` }));
+    mesh.add(atmo);
+    // Oy
+    const moonPivot = new THREE.Object3D(); mesh.add(moonPivot);
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(p.radius*0.27,24,24),
+      new THREE.MeshStandardMaterial({ map:rockyTexture('#9a9a9a',['#7a7a7a','#b5b5b5'],60), roughness:1 }));
+    moon.position.x = p.radius*3.2; moonPivot.add(moon);
+    rec.extras.moonPivot = moonPivot;
+
+    // Sun'iy yo‘ldoshlar — turli orbita va qiyalikda
+    rec.extras.sats = [];
+    const satCount = 7;
+    for(let i=0;i<satCount;i++){
+      const sp = new THREE.Object3D();
+      sp.rotation.x = (Math.random()-0.5)*1.6;
+      sp.rotation.z = (Math.random()-0.5)*1.6;
+      mesh.add(sp);
+      const sat = makeSatellite(0.5+Math.random()*0.5);
+      sat.position.x = p.radius*(1.45+Math.random()*0.9);
+      sat.rotation.y = Math.random()*Math.PI;
+      sp.add(sat);
+      // orbita izi (ingichka halqa)
+      const trailR = sat.position.x;
+      const tg=[]; for(let k=0;k<=64;k++){ const a=k/64*Math.PI*2; tg.push(new THREE.Vector3(Math.cos(a)*trailR,0,Math.sin(a)*trailR)); }
+      const trail=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(tg),
+        new THREE.LineBasicMaterial({ color:0x6fa8ff, transparent:true, opacity:0.16 }));
+      sp.add(trail);
+      rec.extras.sats.push({ pivot:sp, speed:0.4+Math.random()*0.9, satMesh:sat, spin:0.5+Math.random() });
+    }
+  }
+
+  if (p.special==='saturn' || p.key==='uranus'){
+    // Halqalar (Saturn to‘liq, Uran ingichka)
+    const inner = p.radius*1.4, outer = p.radius*(p.key==='uranus'?1.9:2.4);
+    const rg = new THREE.RingGeometry(inner, outer, 96);
+    // UV ni radial qilib moslash
+    const pos=rg.attributes.position; const uv=rg.attributes.uv; const v3=new THREE.Vector3();
+    for(let i=0;i<pos.count;i++){ v3.fromBufferAttribute(pos,i);
+      const t=(v3.length()-inner)/(outer-inner); uv.setXY(i, t, 0.5); }
+    const ringMat = new THREE.MeshBasicMaterial({ map:ringTexture(), side:THREE.DoubleSide,
+      transparent:true, opacity:p.key==='uranus'?0.5:0.95, depthWrite:false });
+    const ring = new THREE.Mesh(rg, ringMat);
+    ring.rotation.x = Math.PI/2;
+    if(p.key==='uranus') ring.rotation.y = THREE.MathUtils.degToRad(0); // o‘q qiyaligini meshdan oladi
+    mesh.add(ring);
+    rec.extras.ring = ring;
+  }
+
+  // Atmosfera / haze halqasi (Yerda o‘ziniki bor)
+  if(p.special!=='earth'){
+    const gas = (p.key==='jupiter'||p.key==='saturn'||p.key==='uranus'||p.key==='neptune'||p.key==='venus');
+    addHaze(mesh, p.radius, p.color, gas?3.0:4.5, gas?1.14:1.06);
+  }
+
+  orbitObjects.push(rec);
+});
+/* --------------------------------------------------------------------------
+   6. ASTEROIDLAR KAMARI (Mars va Yupiter orasida)
+   -------------------------------------------------------------------------- */
+const beltCount = 1400;
+const astGeo = new THREE.IcosahedronGeometry(0.35, 0);
+const astMat = new THREE.MeshStandardMaterial({ color:0x8a8073, roughness:1, metalness:0.1 });
+const belt = new THREE.InstancedMesh(astGeo, astMat, beltCount);
+const dummy = new THREE.Object3D();
+for(let i=0;i<beltCount;i++){
+  const a=Math.random()*Math.PI*2;
+  const r=96 + Math.random()*16;
+  dummy.position.set(Math.cos(a)*r, (Math.random()-0.5)*4, Math.sin(a)*r);
+  const s=0.3+Math.random()*1.4; dummy.scale.set(s,s,s);
+  dummy.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+  dummy.updateMatrix(); belt.setMatrixAt(i, dummy.matrix);
+}
+const beltGroup = new THREE.Group(); beltGroup.add(belt); scene.add(beltGroup);
+
+/* --------------------------------------------------------------------------
+   7. UCHIB O‘TUVCHI KOMETALAR
+   -------------------------------------------------------------------------- */
+const comets = [];
+function makeComet(){
+  const g = new THREE.Group();
+  const head = new THREE.Mesh(new THREE.SphereGeometry(1.0,16,16),
+    new THREE.MeshBasicMaterial({ color:0xcfe6ff }));
+  const headGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTexture(),
+    color:0x9fcfff, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false }));
+  headGlow.scale.set(10,10,1);
+  // Dum — cho‘zilgan additiv sprite
+  const tail = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTexture(),
+    color:0x88c0ff, transparent:true, opacity:0.6, blending:THREE.AdditiveBlending, depthWrite:false }));
+  tail.scale.set(8, 46, 1); tail.position.y = 23;
+  g.add(head, headGlow, tail);
+  scene.add(g);
+  const rec = { g, tail,
+    a: Math.random()*Math.PI*2,
+    ra: 260+Math.random()*120, rb: 150+Math.random()*80,
+    speed: 0.12+Math.random()*0.1,
+    inc: (Math.random()-0.5)*0.6, t: Math.random()*Math.PI*2 };
+  comets.push(rec);
+}
+makeComet(); makeComet(); makeComet();
+
+/* --------------------------------------------------------------------------
+   8. KAMERA — sayyoraga silliq «uchib borish»
+   -------------------------------------------------------------------------- */
+let flight = null;          // joriy uchish animatsiyasi
+let focusRec = null;        // diqqat markazidagi sayyora
+const tmpV = new THREE.Vector3();
+const focusPrev = new THREE.Vector3();   // fokusdagi sayyoraning oldingi pozitsiyasi
+
+function easeInOut(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+// Panel ochiq bo‘lganda sayyora ekran o‘rtasida emas, yon (yoki tepa) tarafga suriladi
+function focusTarget(planetPos){
+  const out = planetPos.clone();
+  if(!panel.classList.contains('open')) return out;
+  const dist = camera.position.distanceTo(planetPos);
+  const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd);
+  const rightV = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
+  if(window.innerWidth <= 680){
+    // mobil: panel pastda → sayyorani yuqoriroqqa (target pastga)
+    const upV = new THREE.Vector3().crossVectors(rightV, fwd).normalize();
+    out.addScaledVector(upV, -dist*0.26);
+  } else {
+    // desktop: panel o‘ngda → sayyorani chaproqqa (target o‘ngga)
+    out.addScaledVector(rightV, dist*0.34);
+  }
+  return out;
+}
+
+function flyTo(rec){
+  // Sayyoraga nisbatan BARQAROR ofset — kamera faqat shu sayyoraga yaqinlashadi,
+  // Quyoshga intilmaydi va sayyora bilan birga harakatlanadi.
+  const planetPos = new THREE.Vector3(); rec.mesh.getWorldPosition(planetPos);
+  const radius = rec.radius || SUN_RADIUS;
+  const dist = radius*5 + 8;
+  const dir = new THREE.Vector3().subVectors(camera.position, planetPos).normalize();
+  const offset = dir.multiplyScalar(dist); offset.y += radius*1.5;
+  flight = { fromCam: camera.position.clone(), fromTgt: controls.target.clone(),
+    offset, rec, t:0, dur:1.8 };
+  focusRec = null;
+}
+
+function flyToOverview(){
+  flight = {
+    fromCam: camera.position.clone(), toCamFixed: new THREE.Vector3(0,90,320),
+    fromTgt: controls.target.clone(), toTgtFixed: new THREE.Vector3(0,0,0),
+    rec:null, t:0, dur:1.8
+  };
+  focusRec = null;
+  closePanel();
+  setActiveDock(null);
+  if(typeof hideTourCaption==='function') hideTourCaption();
+}
+
+/* --------------------------------------------------------------------------
+   9. RAYCASTING — bosishni aniqlash
+   -------------------------------------------------------------------------- */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let downXY = null;
+
+renderer.domElement.addEventListener('pointerdown', e=>{ downXY=[e.clientX,e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e=>{
+  if(!downXY) return;
+  const moved = Math.hypot(e.clientX-downXY[0], e.clientY-downXY[1]);
+  downXY=null;
+  if(moved>6) return; // bu drag edi, bosish emas
+  pointer.x = (e.clientX/window.innerWidth)*2-1;
+  pointer.y = -(e.clientY/window.innerHeight)*2+1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects([sun, ...planetMeshes], false);
+  if(hits.length){
+    const obj = hits[0].object;
+    playClick(880);
+    if(tourActive) stopTour(false);   // qo‘lda bosilsa tur to‘xtaydi
+    if(obj===sun){ selectBody(sun.userData); flightToSun(); }
+    else {
+      const rec = orbitObjects.find(r=>r.mesh===obj);
+      if(rec){ selectBody(rec); flyTo(rec); }
+    }
+  }
+});
+
+function flightToSun(){
+  const offset = new THREE.Vector3(0, SUN_RADIUS*2, SUN_RADIUS*6);
+  flight={ fromCam:camera.position.clone(), fromTgt:controls.target.clone(),
+    offset, rec:'sun', t:0, dur:1.8 };
+  focusRec=null;
+}
+
+/* --------------------------------------------------------------------------
+   10. UI — ma'lumot paneli, dock, tugmalar
+   -------------------------------------------------------------------------- */
+const panel = document.getElementById('panel');
+const elName = document.getElementById('panelName');
+const elType = document.getElementById('panelType');
+const elDesc = document.getElementById('panelDesc');
+const elStats= document.getElementById('panelStats');
+const elFact = document.getElementById('panelFact');
+
+const elActions = document.getElementById('panelActions');
+const elFactLabel = document.getElementById('factLabel');
+
+function compBars(comp){
+  const colors=['#4ea8ff','#a06bff','#42d6c4','#ffb347','#ff6b9d'];
+  return comp.map((c,i)=>`<div class="comp-row">
+    <div class="comp-top"><span>${c[0]}</span><span>${c[1]}%</span></div>
+    <div class="comp-bar"><i style="width:${Math.min(c[1],100)}%;background:${colors[i%colors.length]}"></i></div>
+  </div>`).join('');
+}
+function mkBtn(label, cls, fn){
+  const b=document.createElement('button'); b.className='pbtn '+cls; b.textContent=label;
+  b.addEventListener('click', fn); return b;
+}
+function buildPanelActions(rec, key){
+  const ui = window.LOC[LANG].ui;
+  elActions.innerHTML='';
+  // Yaqindan ko‘rish
+  elActions.appendChild(mkBtn(ui.focusBtn,'primary',()=>{
+    playClick(760); key==='sun' ? flightToSun() : flyTo(rec);
+  }));
+  // Kontekstli: halqalar (Saturn/Uran) — bilan / halqalarsiz
+  if(rec && rec.extras && rec.extras.ring){
+    const on = rec.extras.ring.visible;
+    elActions.appendChild(mkBtn(on?ui.ringsOff:ui.ringsOn,'',()=>{
+      rec.extras.ring.visible = !rec.extras.ring.visible; playClick(640); buildPanelActions(rec,key);
+    }));
+  }
+  // Kontekstli: yo‘ldoshlar (Yer) — bilan / yo‘ldoshsiz
+  if(rec && rec.extras && rec.extras.sats){
+    const on = rec.extras.sats[0].pivot.visible;
+    elActions.appendChild(mkBtn(on?ui.satsOff:ui.satsOn,'',()=>{
+      rec.extras.sats.forEach(s=>{ s.pivot.visible=!on; }); playClick(640); buildPanelActions(rec,key);
+    }));
+  }
+  // Umumiy ko‘rinish
+  elActions.appendChild(mkBtn(ui.backBtn,'',()=>{ playClick(520); flyToOverview(); }));
+}
+function selectBody(rec){
+  const isSun = !!rec.isSun || rec.key==='sun';
+  const key = rec.key;
+  lastSelectedKey = key;
+  const d = bodyData(key); const ui = window.LOC[LANG].ui;
+  elType.textContent = d.type;
+  elName.textContent = d.name;
+  elDesc.textContent = d.desc;
+  elStats.innerHTML = `
+    <div class="sec-title">${ui.secMain}</div>
+    <div class="stats-grid">
+      <div class="stat"><div class="k">${ui.lDist}</div><div class="v">${d.dist}</div></div>
+      <div class="stat"><div class="k">${ui.lDia}</div><div class="v">${d.dia}</div></div>
+      <div class="stat"><div class="k">${ui.lMass}</div><div class="v">${d.mass}</div></div>
+      <div class="stat"><div class="k">${ui.lMoons}</div><div class="v">${d.moons}</div></div>
+    </div>
+    <div class="sec-title">${ui.secPhys}</div>
+    <div class="stats-grid">
+      <div class="stat"><div class="k">${ui.lPeriod}</div><div class="v">${d.period}</div></div>
+      <div class="stat"><div class="k">${ui.lDay}</div><div class="v">${d.day}</div></div>
+      <div class="stat"><div class="k">${ui.lGravity}</div><div class="v">${d.gravity}</div></div>
+      <div class="stat"><div class="k">${ui.lEscape}</div><div class="v">${d.escape}</div></div>
+      <div class="stat"><div class="k">${ui.lVelocity}</div><div class="v">${d.velocity}</div></div>
+      <div class="stat"><div class="k">${ui.lDensity}</div><div class="v">${d.density}</div></div>
+      <div class="stat"><div class="k">${ui.lTilt}</div><div class="v">${d.tilt}</div></div>
+      <div class="stat"><div class="k">${ui.lTemp}</div><div class="v">${d.temp}</div></div>
+      <div class="stat wide"><div class="k">${ui.lDiscovered}</div><div class="v">${d.discovered}</div></div>
+    </div>
+    <div class="sec-title">${ui.secComp}</div>
+    <div class="comp">${compBars(d.comp)}</div>
+  `;
+  elFactLabel.textContent = ui.factLabel;
+  elFact.textContent = d.fact;
+  buildPanelActions(isSun ? null : rec, key);
+  panel.classList.add('open');
+  setActiveDock(key);
+}
+function closePanel(){ panel.classList.remove('open'); }
+document.getElementById('panelClose').addEventListener('click', ()=>{ playClick(440); closePanel(); setActiveDock(null); });
+document.getElementById('resetBtn').addEventListener('click', ()=>{ playClick(520); if(tourActive) stopTour(false); flyToOverview(); });
+
+// Pastki dock — Quyosh + sayyoralar (tilga qarab qayta quriladi)
+const dock = document.getElementById('dock');
+function mkDockItem(label, color, onClick, key){
+  const b=document.createElement('button');
+  b.className='dock-item'; b.dataset.key=key;
+  b.innerHTML=`<span class="dock-swatch" style="background:${color};color:${color}"></span>${label}`;
+  b.addEventListener('click', onClick);
+  dock.appendChild(b);
+}
+function buildDock(){
+  dock.innerHTML='';
+  mkDockItem(bodyData('sun').name, '#ffb347', ()=>{ if(tourActive) stopTour(false); playClick(880); selectBody(sun.userData); flightToSun(); }, 'sun');
+  orbitObjects.forEach(rec=>{
+    const hex = '#'+new THREE.Color(rec.color).getHexString();
+    mkDockItem(bodyData(rec.key).name, hex, ()=>{ if(tourActive) stopTour(false); playClick(880); selectBody(rec); flyTo(rec); }, rec.key);
+  });
+  setActiveDock(lastSelectedKey);
+}
+function setActiveDock(key){
+  dock.querySelectorAll('.dock-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.key===key);
+  });
+}
+
+/* --------------------------------------------------------------------------
+   10b. TIL ALMASHTIRGICH (UZ / RU / EN)
+   -------------------------------------------------------------------------- */
+function applyLanguage(lang){
+  LANG = lang; localStorage.setItem('solar_lang', lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    el.textContent = tUI(el.getAttribute('data-i18n'));
+  });
+  document.getElementById('resetBtn').title = tUI('backBtn');
+  if(speedEl) speedEl.title = tUI('speedTitle');
+  elFactLabel.textContent = tUI('factLabel');
+  const cl=document.getElementById('creditLabel'); if(cl) cl.textContent = tUI('authorLabel');
+  if(typeof updateTourBtn==='function') updateTourBtn();
+  if(typeof cosmos!=='undefined' && cosmos.classList.contains('open')) showCosmos();
+  if(typeof tourCaption!=='undefined' && tourCaption.classList.contains('show') && currentTourKey) showTourCaption(currentTourKey);
+  buildDock();
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+  // ochiq panelni yangi tilda qayta chizish
+  if(panel.classList.contains('open') && lastSelectedKey){
+    const r = lastSelectedKey==='sun' ? sun.userData : orbitObjects.find(o=>o.key===lastSelectedKey);
+    if(r) selectBody(r);
+  }
+}
+function buildLangSwitch(container){
+  if(!container) return;
+  container.innerHTML='';
+  ['uz','ru','en'].forEach(lc=>{
+    const b=document.createElement('button'); b.className='lang-btn'; b.dataset.lang=lc;
+    b.textContent = window.LOC[lc].langName;
+    b.addEventListener('click', ()=>{ playClick(700); applyLanguage(lc); });
+    container.appendChild(b);
+  });
+}
+
+/* --------------------------------------------------------------------------
+   10c. SAYOHAT (avtomatik tur) + KOINOT FAKTLARI
+   -------------------------------------------------------------------------- */
+const tourBtn = document.getElementById('tourBtn');
+const cosmos  = document.getElementById('cosmos');
+const tourCaption = document.getElementById('tourCaption');
+const tcName = document.getElementById('tcName');
+const tcText = document.getElementById('tcText');
+let tourActive=false, tourTimer=null, tourIdx=0, currentTourKey=null;
+
+function updateTourBtn(){
+  tourBtn.classList.toggle('active', tourActive);
+  tourBtn.title = tourActive ? tUI('tourStop') : tUI('tourBtn');
+  tourBtn.textContent = tourActive ? '⏹' : '✈';
+}
+function showTourCaption(key){
+  const tour = window.LOC[LANG].tour || {};
+  currentTourKey = key;
+  tcName.textContent = bodyData(key).name;
+  tcText.textContent = tour[key] || '';
+  tourCaption.classList.add('show');
+}
+function hideTourCaption(){ tourCaption.classList.remove('show'); }
+
+function tourStep(){
+  if(!tourActive) return;
+  const seq = [{key:'sun',rec:null}, ...orbitObjects.map(r=>({key:r.key,rec:r}))];
+  if(tourIdx >= seq.length){            // oxirida koinot faktlari
+    tourActive=false; clearTimeout(tourTimer); updateTourBtn();
+    hideTourCaption(); showCosmos();
+    return;
+  }
+  const item = seq[tourIdx];
+  // Sayohatda ma'lumot paneli emas — alohida hikoya matni ko‘rsatiladi
+  if(item.key==='sun') flightToSun(); else flyTo(item.rec);
+  setActiveDock(item.key);
+  showTourCaption(item.key);
+  tourIdx++;
+  tourTimer = setTimeout(tourStep, 6500);   // har bekatda ~6.5s (uchish + matnni o‘qish)
+}
+function startTour(){
+  tourActive=true; tourIdx=0; closeCosmos(); closePanel(); playClick(720);
+  updateTourBtn();
+  tourStep();
+}
+function stopTour(resetView){
+  if(!tourActive) return;
+  tourActive=false; clearTimeout(tourTimer); updateTourBtn(); hideTourCaption();
+  if(resetView) flyToOverview();
+}
+tourBtn.addEventListener('click', ()=>{ tourActive ? stopTour(true) : startTour(); });
+
+function showCosmos(){
+  const ui = window.LOC[LANG].ui;
+  document.getElementById('cosmosTitle').textContent = ui.cosmosTitle;
+  document.getElementById('cosmosList').innerHTML = ui.cosmosFacts.map(f=>`<li>${f}</li>`).join('');
+  cosmos.classList.add('open'); playClick(560);
+}
+function closeCosmos(){ cosmos.classList.remove('open'); }
+document.getElementById('cosmosClose').addEventListener('click', ()=>{ playClick(440); closeCosmos(); });
+
+/* --------------------------------------------------------------------------
+   11. BOSISH OVOZI (Web Audio — qisqa SFX, fon musiqasi yo‘q)
+   -------------------------------------------------------------------------- */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx=null; }
+  }
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+}
+function playClick(freq=820){
+  ensureAudio(); if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+  o.type='sine';
+  o.frequency.setValueAtTime(freq, t);
+  o.frequency.exponentialRampToValueAtTime(freq*0.55, t+0.13);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.16, t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+0.18);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t); o.stop(t+0.2);
+}
+
+/* Aylanish tezligi boshqaruvi (slider + pauza) */
+const speedEl = document.getElementById('speed');
+const pauseBtn = document.getElementById('pauseBtn');
+const speedVal = document.getElementById('speedVal');
+function setSpeed(v){
+  simSpeed = v;
+  if(speedEl) speedEl.value = v;
+  if(speedVal) speedVal.textContent = v.toFixed(1)+'×';
+  pauseBtn.textContent = simSpeed===0 ? '▶' : '⏸';
+  pauseBtn.classList.toggle('active', simSpeed===0);
+}
+if(speedEl) speedEl.addEventListener('input', e=>{
+  const v = parseFloat(e.target.value);
+  if(v>0) lastSpeed = v;
+  setSpeed(v);
+});
+pauseBtn.addEventListener('click', ()=>{
+  if(simSpeed>0){ lastSpeed = simSpeed; setSpeed(0); }
+  else { setSpeed(lastSpeed||1); }
+});
+
+/* --------------------------------------------------------------------------
+   12. INTRO / START
+   -------------------------------------------------------------------------- */
+const loader = document.getElementById('loader');
+const intro  = document.getElementById('intro');
+const topbar = document.getElementById('topbar');
+
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{ loader.classList.add('hidden'); intro.classList.remove('hidden'); }, 600);
+});
+
+// Tilni va dock/UI ni dastlabki holatda o‘rnatish
+buildLangSwitch(document.getElementById('introLang'));
+buildLangSwitch(document.getElementById('topLang'));
+applyLanguage(LANG);
+
+// Interfeysni yashirish / ko‘rsatish (kinematik ko‘rinish)
+const uiToggle = document.getElementById('uiToggle');
+uiToggle.addEventListener('click', ()=>{
+  playClick(600);
+  const hidden = document.body.classList.toggle('clean');
+  uiToggle.textContent = hidden ? '🙈' : '👁';
+  uiToggle.title = hidden ? tUI('showUI') : tUI('hideUI');
+});
+
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  ensureAudio(); playClick(700);
+  intro.style.transition='opacity .8s ease'; intro.style.opacity='0';
+  setTimeout(()=>intro.classList.add('hidden'), 800);
+  topbar.classList.remove('hidden');
+  dock.classList.remove('hidden');
+  uiToggle.classList.remove('hidden');
+  // kinematik kirish: uzoqdan tizimga uchib kirish
+  camera.position.set(0, 420, 900);
+  flight={ fromCam:camera.position.clone(), toCamFixed:new THREE.Vector3(0,90,320),
+    fromTgt:new THREE.Vector3(0,0,0), toTgtFixed:new THREE.Vector3(0,0,0), rec:null, t:0, dur:3.5 };
+});
+
+/* --------------------------------------------------------------------------
+   13. ANIMATSIYA SILVASI
+   -------------------------------------------------------------------------- */
+const sunWorld = new THREE.Vector3();
+let simSpeed = 1;       // aylanish tezligi koeffitsienti (0 = to‘xtagan)
+let lastSpeed = 1;      // pauzadan keyin tiklash uchun
+let simTime = 0;        // simulyatsiya vaqti (pauzada to‘xtaydi)
+function animate(){
+  requestAnimationFrame(animate);
+  const dt  = Math.min(clock.getDelta(), 0.05);
+  const sdt = dt * simSpeed;     // tezlikka bog‘liq vaqt qadami
+  simTime  += sdt;
+
+  // Quyosh shader vaqti + korona pulsatsiyasi (pauzada to‘xtaydi)
+  sunMat.uniforms.time.value = simTime;
+  const pulse = 1 + Math.sin(simTime*1.5)*0.04;
+  corona.scale.set(SUN_RADIUS*7*pulse, SUN_RADIUS*7*pulse, 1);
+  sun.rotation.y += sdt*0.05;
+
+  // Sayyoralar: orbita + o‘z o‘qi atrofida aylanish
+  orbitObjects.forEach(rec=>{
+    rec.pivot.rotation.y += rec.speed * sdt * 12;
+    rec.mesh.rotation.y  += rec.spin  * sdt * 60;
+    if(rec.extras.clouds)   rec.extras.clouds.rotation.y += sdt*0.06;
+    if(rec.extras.moonPivot)rec.extras.moonPivot.rotation.y += sdt*0.7;
+    if(rec.extras.sats) rec.extras.sats.forEach(s=>{
+      s.pivot.rotation.y += s.speed * sdt;
+      s.satMesh.rotation.y += s.spin * sdt;
+    });
+    // Yer shaderiga Quyosh yo‘nalishini berish
+    if(rec.special==='earth'){
+      rec.mesh.getWorldPosition(tmpV);
+      sun.getWorldPosition(sunWorld);
+      const dir=new THREE.Vector3().subVectors(sunWorld,tmpV).normalize();
+      rec.mesh.material.uniforms.sunDir.value.copy(dir);
+    }
+  });
+
+  // Asteroidlar kamari sekin aylanadi
+  beltGroup.rotation.y += sdt*0.02;
+
+  // Kometalar elliptik orbitada
+  comets.forEach(c=>{
+    c.t += sdt*c.speed;
+    const x=Math.cos(c.t)*c.ra, z=Math.sin(c.t)*c.rb, y=Math.sin(c.t)*c.inc*60;
+    c.g.position.set(x,y,z);
+    // dum Quyoshdan teskari yo‘nalishga qaraydi
+    const away=c.g.position.clone().normalize();
+    c.tail.position.copy(away.multiplyScalar(23));
+  });
+
+  // Parallaks: yulduz qatlamlari turli tezlikda aylanadi
+  starsFar.rotation.y  += sdt*0.004;
+  starsNear.rotation.y -= sdt*0.006;
+  nebulaGroup.rotation.y += sdt*0.002;
+  dust.rotation.y += sdt*0.01;
+
+  // Kamera uchish animatsiyasi
+  if(flight){
+    flight.t += dt/flight.dur;
+    const k = easeInOut(Math.min(flight.t,1));
+    if(flight.rec){
+      // Sayyora/Quyoshga nisbatan barqaror ofset — joriy pozitsiyani kuzatadi
+      if(flight.rec==='sun') tmpV.set(0,0,0);
+      else flight.rec.mesh.getWorldPosition(tmpV);
+      const camTarget = tmpV.clone().add(flight.offset);
+      camera.position.lerpVectors(flight.fromCam, camTarget, k);
+      controls.target.lerpVectors(flight.fromTgt, focusTarget(tmpV), k);
+    } else {
+      // Umumiy ko‘rinishga qaytish (qat'iy nuqtaga)
+      camera.position.lerpVectors(flight.fromCam, flight.toCamFixed, k);
+      controls.target.lerpVectors(flight.fromTgt, flight.toTgtFixed, k);
+    }
+    if(flight.t>=1){
+      if(flight.rec && flight.rec!=='sun'){
+        focusRec=flight.rec;
+        focusRec.mesh.getWorldPosition(focusPrev);
+      }
+      flight=null;
+    }
+  } else if(focusRec){
+    // Sayyora bilan birga harakatlanish — kamera u bilan suriladi, atrofida aylanish mumkin
+    focusRec.mesh.getWorldPosition(tmpV);
+    camera.position.add(tmpV.clone().sub(focusPrev));   // sayyora siljishini kamera ham takrorlaydi
+    focusPrev.copy(tmpV);
+    controls.target.copy(focusTarget(tmpV));
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+/* --------------------------------------------------------------------------
+   14. RESPONSIVE
+   -------------------------------------------------------------------------- */
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+})();
+
+</script>
+</body>
+</html>
